@@ -34,7 +34,7 @@
             <i class="fas fa-tv text-4xl text-yellow-300 drop-shadow-md"></i>
             <div>
                 <h1 class="text-3xl font-black tracking-wide leading-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-indigo-200">PACKING COMMAND CENTER</h1>
-                <p class="text-indigo-200 text-sm font-medium tracking-wider">Real-time TV Monitor (CSV Version)</p>
+                <p class="text-indigo-200 text-sm font-medium tracking-wider" id="sourceModeText">Real-time TV Monitor</p>
             </div>
         </div>
         <div class="flex items-center gap-4">
@@ -78,7 +78,7 @@
             <div class="flex-1 bg-slate-800 rounded-2xl shadow-lg border border-slate-700 p-4 2xl:p-6 flex flex-col justify-center relative overflow-hidden">
                 <div class="flex justify-between items-end mb-3">
                     <p class="text-slate-300 text-lg 2xl:text-xl font-bold">ความคืบหน้า</p>
-                    <h3 class="text-4xl 2xl:text-5xl font-black text-white leading-none tracking-tighter" id="progressPercent text">0%</h3>
+                    <h3 class="text-4xl 2xl:text-5xl font-black text-white leading-none tracking-tighter" id="progressPercentText">0%</h3>
                 </div>
                 <div class="w-full bg-slate-900 rounded-full h-4 2xl:h-5 shadow-inner p-1">
                     <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-1000 progress-bar-animated shadow-[0_0_10px_rgba(99,102,241,0.5)]" style="width: 0%"></div>
@@ -193,19 +193,22 @@
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden z-50 flex items-center justify-center transition-opacity">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden">
             <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center">
-                <h2 class="text-xl font-bold text-white"><i class="fas fa-file-csv mr-2"></i> ตั้งค่าการดึงข้อมูล (CSV)</h2>
+                <h2 class="text-xl font-bold text-white"><i class="fas fa-bolt mr-2"></i> ตั้งค่าการดึงข้อมูล</h2>
                 <button onclick="closeSettings()" class="text-indigo-200 hover:text-white transition-colors"><i class="fas fa-times text-2xl"></i></button>
             </div>
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="block text-base font-bold text-slate-700 mb-1">ลิงก์ CSV จาก Google Sheets *</label>
-                    <input type="text" id="csvURL" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-base rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
-                    <p class="text-sm text-slate-500 mt-2 font-medium"><i class="fas fa-info-circle"></i> ใช้ลิงก์จาก: ไฟล์ > แชร์ > เผยแพร่ไปยังเว็บ > เลือกเป็น .csv</p>
+                    <label class="block text-base font-bold text-slate-700 mb-1">ลิงก์ข้อมูล (ไม่ต้องกรอกก็ได้)</label>
+                    <input type="text" id="csvURL" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-base rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" placeholder="เว้นว่าง = ไล่หาช่องทางที่ใช้ได้อัตโนมัติ">
+                    <p class="text-sm text-slate-500 mt-2 font-medium leading-relaxed">
+                        <i class="fas fa-wand-magic-sparkles text-indigo-500"></i> ปกติเว้นว่างไว้ ระบบจะไล่ลอง Apps Script → gviz → CSV ที่เผยแพร่ ให้เอง<br>
+                        <i class="fas fa-link text-slate-400"></i> กรอกเมื่อต้องการล็อกช่องทางเดียว (Web app <code>/exec</code> หรือลิงก์ <code>output=csv</code>)
+                    </p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-base font-bold text-slate-700 mb-1">ความถี่อัปเดต (วินาที)</label>
-                        <input type="number" id="refreshRate" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-base rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" value="5">
+                        <input type="number" id="refreshRate" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-base rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" value="10">
                     </div>
                     <div>
                         <label class="block text-base font-bold text-slate-700 mb-1">คำที่แปลว่า "รอแพ็ค"</label>
@@ -233,21 +236,51 @@
     <script>
         Chart.register(ChartDataLabels);
 
-        // ดึงค่าการตั้งค่าจาก LocalStorage
-        const defaultCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRs1280kImEMoT9txLP_sklmqa3PUGuWpLrzERwx3AdkyAUjC7K5ItmC0OhcqxSsJYydQpwKzMFtTXr/pub?gid=1174887101&single=true&output=csv';
-        let currentUrl = localStorage.getItem('packing_tv_csv_url');
-        if (!currentUrl || !currentUrl.includes('output=csv')) {
-            currentUrl = defaultCsvUrl;
+        /* ============================================================
+           1) วาง Web app URL จาก Apps Script ตรงนี้ (ลงท้าย /exec)
+           ============================================================ */
+        const API_URL = 'https://script.google.com/macros/s/AKfycbwjDo0tCzi8Zq4RedjBuJ5wkx0yk7h_X4aMTPdIp4lC_0UpjN3p2B-Dr1NM0OeOiwyq/exec';
+
+        const SHEET_ID = '1rrlfYMVryiE2HmRer9-W9hTrYJlK0-lj83dsK7lPSFM';
+        const SHEET_GID = '1174887101';
+        const GVIZ_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`;
+        const PUB_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRs1280kImEMoT9txLP_sklmqa3PUGuWpLrzERwx3AdkyAUjC7K5ItmC0OhcqxSsJYydQpwKzMFtTXr/pub?gid=1174887101&single=true&output=csv';
+
+        /* ลำดับการลองดึงข้อมูล — ไล่จากเร็ว/สดที่สุดลงไป
+           ตัวไหนใช้ไม่ได้ก็ข้ามให้อัตโนมัติ จอไม่ดับแน่นอน */
+        const SOURCES = [
+            { name: 'Apps Script (JSONP)', type: 'jsonp', url: API_URL,     live: true  },
+            { name: 'Apps Script (fetch)', type: 'json',  url: API_URL,     live: true  },
+            { name: 'Sheet gviz',          type: 'csv',   url: GVIZ_URL,    live: true  },
+            { name: 'Published CSV',       type: 'csv',   url: PUB_CSV_URL, live: false }
+        ];
+
+        // localStorage แบบกันพัง (บางเบราว์เซอร์/โหมด preview บล็อกไว้)
+        const store = {
+            mem: {},
+            get(k) { try { return localStorage.getItem(k); } catch (e) { return this.mem[k] || null; } },
+            set(k, v) { try { localStorage.setItem(k, v); } catch (e) { this.mem[k] = v; } }
+        };
+
+        // ลิงก์ที่ตั้งเองจากหน้าเฟือง (ว่าง = ใช้ SOURCES ไล่อัตโนมัติ)
+        let manualUrl = store.get('packing_src_url_v2') || '';
+        let activeIdx = 0;   // source ที่ใช้ได้ล่าสุด
+
+        function getSources() {
+            if (!manualUrl) return SOURCES;
+            const type = /output=csv|gviz\/tq/i.test(manualUrl) ? 'csv'
+                       : (/\/exec/i.test(manualUrl) ? 'jsonp' : 'json');
+            const list = [{ name: 'ลิงก์ที่ตั้งเอง', type: type, url: manualUrl, live: type !== 'csv' || /gviz/i.test(manualUrl) }];
+            if (type === 'jsonp') list.push({ name: 'ลิงก์ที่ตั้งเอง (fetch)', type: 'json', url: manualUrl, live: true });
+            return list;
         }
-        
-        let currentRefreshRate = parseInt(localStorage.getItem('packing_refresh_rate')) || 5;
-        let pendingKeyword = localStorage.getItem('packing_pending_keyword') || 'ยังไม่ได้แพ็ค';
+
+        let currentRefreshRate = parseInt(store.get('packing_refresh_rate')) || 10;
+        let pendingKeyword = store.get('packing_pending_keyword') || 'ยังไม่ได้แพ็ค';
         
         let countdownTimer;
         let gauges = {};
         let peakChartInst = null;
-        
-        // ตัวแปรสำหรับ Auto Scroll
         let scrollIntervals = {};
 
         // การตั้งค่า Gauge Chart ให้เหมาะกับ TV
@@ -258,7 +291,7 @@
                 maintainAspectRatio: false,
                 circumference: 180,
                 rotation: -90,
-                cutout: '75%', // หนาขึ้นนิดนึงให้เห็นสีชัดๆบนทีวี
+                cutout: '75%',
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: false },
@@ -279,10 +312,10 @@
                     }
                 });
             };
-            gauges.shopee = createGauge('gaugeShopee', '#f97316'); // Shopee Orange
-            gauges.tiktok = createGauge('gaugeTiktok', '#000000'); // Tiktok Black
-            gauges.lazada = createGauge('gaugeLazada', '#2563eb'); // Lazada Blue
-            gauges.walkin = createGauge('gaugeWalkin', '#10b981'); // Line Green
+            gauges.shopee = createGauge('gaugeShopee', '#f97316');
+            gauges.tiktok = createGauge('gaugeTiktok', '#000000');
+            gauges.lazada = createGauge('gaugeLazada', '#2563eb');
+            gauges.walkin = createGauge('gaugeWalkin', '#10b981');
         }
 
         function cleanURL(url) {
@@ -290,41 +323,126 @@
             return url.replace(/^[\[\(]+|[\]\)]+$/g, '').trim().match(/(https?:\/\/[^\s]+)/g)?.[0] || url;
         }
 
-        function fetchData() {
-            showLoading(true);
-            const urlToFetch = cleanURL(currentUrl);
-            
-            if (!urlToFetch || !urlToFetch.toLowerCase().includes('output=csv')) {
-                showError("กรุณาตรวจสอบลิงก์อีกครั้ง! ระบบรองรับเฉพาะลิงก์ CSV (Publish to web) เท่านั้น");
-                showLoading(false);
-                if(!currentUrl) openSettings();
-                return;
-            }
+        function bust(url, extra) {
+            return url + (url.includes('?') ? '&' : '?') + (extra || '') + 'cb=' + Date.now();
+        }
 
-            // ทริคความไว: เพิ่ม Timestamp หลอกเบราว์เซอร์ไม่ให้จำ Cache (โหลดข้อมูลใหม่เสมอ)
-            const timeStamp = new Date().getTime();
-            const noCacheUrl = urlToFetch + (urlToFetch.includes('?') ? '&' : '?') + 'cb=' + timeStamp;
+        // โหลดผ่าน <script> — ไม่ติด CORS และตาม redirect ของ Google ได้เอง
+        function loadJsonp(url, timeoutMs) {
+            return new Promise((resolve, reject) => {
+                const cbName = '__pk' + Date.now() + Math.floor(Math.random() * 1e4);
+                const tag = document.createElement('script');
+                let settled = false;
 
-            Papa.parse(noCacheUrl, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    document.getElementById('errorAlert').classList.add('hidden');
-                    processData(results.data);
-                    showLoading(false);
-                    startCountdown();
-                },
-                error: function(error) {
-                    console.error("PapaParse Fetch Error:", error);
-                    showError("ดาวน์โหลด CSV ล้มเหลว! โปรดตรวจสอบการตั้งค่า Publish to web");
-                    showLoading(false);
-                    startCountdown();
-                }
+                const cleanup = () => {
+                    try { delete window[cbName]; } catch (e) { window[cbName] = undefined; }
+                    if (tag.parentNode) tag.parentNode.removeChild(tag);
+                };
+                const timer = setTimeout(() => {
+                    if (settled) return;
+                    settled = true; cleanup();
+                    reject(new Error('หมดเวลารอ (อาจถูกเด้งไปหน้า login)'));
+                }, timeoutMs || 9000);
+
+                window[cbName] = (data) => {
+                    if (settled) return;
+                    settled = true; clearTimeout(timer); cleanup(); resolve(data);
+                };
+                tag.onerror = () => {
+                    if (settled) return;
+                    settled = true; clearTimeout(timer); cleanup();
+                    reject(new Error('โหลดสคริปต์ไม่สำเร็จ'));
+                };
+
+                tag.src = bust(url, 'callback=' + cbName + '&');
+                document.body.appendChild(tag);
             });
         }
 
-        function processData(data) {
+        function loadJson(url) {
+            return fetch(bust(url), { cache: 'no-store', redirect: 'follow' })
+                .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); });
+        }
+
+        function loadCsv(url) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(bust(url), {
+                    download: true, header: true, skipEmptyLines: true,
+                    complete: r => resolve({ rows: r.data }),
+                    error: e => reject(new Error((e && e.message) || 'ดาวน์โหลด CSV ไม่สำเร็จ'))
+                });
+            });
+        }
+
+        // ข้อมูลใช้ได้จริงไหม (กันกรณีได้หน้า HTML login กลับมาแล้ว parse เป็นขยะ)
+        function isUsable(data) {
+            if (!data || data.ok === false) return false;
+            if (Array.isArray(data.rows)) {
+                return data.rows.length > 0 && Object.prototype.hasOwnProperty.call(data.rows[0], 'Station');
+            }
+            return typeof data.total === 'number' && !!data.platforms;
+        }
+
+        function loadFrom(src) {
+            if (src.type === 'jsonp') return loadJsonp(src.url);
+            if (src.type === 'json')  return loadJson(src.url);
+            return loadCsv(src.url);
+        }
+
+        // ================= ตัวดึงข้อมูล (ไล่ทีละ source จนกว่าจะได้) =================
+        async function fetchData() {
+            showLoading(true);
+            const sources = getSources();
+            const order = sources.slice(activeIdx).concat(sources.slice(0, activeIdx));
+            const problems = [];
+
+            for (const src of order) {
+                if (!src.url || src.url.indexOf('http') !== 0) continue;
+                try {
+                    const data = await loadFrom(src);
+                    if (!isUsable(data)) throw new Error('ข้อมูลไม่ตรงรูปแบบที่ต้องการ');
+
+                    if (data.rows) processRows(data.rows);
+                    else renderSummary(data);
+
+                    activeIdx = sources.indexOf(src);
+                    document.getElementById('errorAlert').classList.add('hidden');
+                    document.getElementById('sourceModeText').innerText =
+                        (src.live ? 'เรียลไทม์ · ' : 'สำรอง (ช้าราว 5 นาที) · ') + src.name;
+                    showLoading(false, data.updatedAt);
+                    startCountdown();
+                    return;
+                } catch (err) {
+                    console.warn('[source ล้มเหลว]', src.name, err.message);
+                    problems.push(src.name);
+                }
+            }
+
+            showError('ดึงข้อมูลไม่สำเร็จทุกช่องทาง (' + problems.join(', ') + ') — เช็คอินเทอร์เน็ตของทีวี หรือกดเฟืองเพื่อตั้งลิงก์เอง');
+            showLoading(false);
+            startCountdown();
+        }
+
+        // ================= เรนเดอร์จาก JSON ที่สรุปมาแล้ว =================
+        function renderSummary(s) {
+            updateOverallStats(s.total, s.packed);
+            updateGauges(s.platforms);
+
+            const couriers = {};
+            (s.couriers || []).forEach(c => { couriers[c.name] = { packed: c.packed, remaining: c.remaining }; });
+            updateCourierList(couriers);
+
+            const packers = {};
+            (s.packers || []).forEach(p => { packers[p.name] = p.count; });
+            updateLeaderboard(packers);
+
+            const peak = {};
+            (s.peak || []).forEach(p => { peak[p.hour] = p.count; });
+            updatePeakTimeChart(peak);
+        }
+
+        // ================= เรนเดอร์จากข้อมูลดิบ (CSV / mode=rows) =================
+        function processRows(data) {
             try {
                 let total = 0, packed = 0;
                 let platforms = {
@@ -335,16 +453,15 @@
                 let packers = {};
                 let peakTimes = {};
 
-                // อ่านข้อมูลแต่ละแถว โดยอ้างอิง Key ตรงกับชื่อ Header ในชีตของคุณ
                 data.forEach(row => {
                     let statusStr = (row['Station'] || '').toString().trim();
-                    if (statusStr === '') return; // ข้ามบรรทัดว่าง
+                    if (statusStr === '') return;
 
                     total++;
                     const isPacked = statusStr !== pendingKeyword;
                     if (isPacked) packed++;
 
-                    // 1. Platform (คอลัมน์ Source)
+                    // Platform (คอลัมน์ Source)
                     let rawP = (row['Source'] || '').toString().toLowerCase();
                     let group = 'WalkIN';
                     if (rawP.includes('shopee')) group = 'Shopee';
@@ -354,19 +471,19 @@
                     if (isPacked) platforms[group].p++;
                     else platforms[group].r++;
 
-                    // 2. ขนส่ง (คอลัมน์ Delivery By)
+                    // ขนส่ง (คอลัมน์ Delivery By)
                     let cName = (row['Delivery By'] || '').toString().trim() || 'ไม่ระบุ';
                     if (!couriers[cName]) couriers[cName] = { packed: 0, remaining: 0 };
                     if (isPacked) couriers[cName].packed++;
                     else couriers[cName].remaining++;
 
-                    // 3. คนแพ็ค (คอลัมน์ Station)
+                    // คนแพ็ค (คอลัมน์ Station)
                     if (isPacked) {
                         if (!packers[statusStr]) packers[statusStr] = 0;
                         packers[statusStr]++;
                     }
 
-                    // 4. Peak Time (คอลัมน์ Time)
+                    // Peak Time (คอลัมน์ Time)
                     if (isPacked) {
                         let timeStr = (row['Time'] || '').toString().trim();
                         if (timeStr) {
@@ -379,7 +496,6 @@
                     }
                 });
 
-                // อัปเดต UI ชิ้นต่างๆ
                 updateOverallStats(total, packed);
                 updateGauges(platforms);
                 updateCourierList(couriers);
@@ -387,25 +503,28 @@
                 updatePeakTimeChart(peakTimes);
                 
             } catch (e) {
-                console.error("Processing Error:", e);
-                showError("รูปแบบข้อมูลไม่ตรงกัน โปรดตรวจสอบหัวคอลัมน์ใน Google Sheet");
+                console.error('Processing Error:', e);
+                showError('รูปแบบข้อมูลไม่ตรงกัน — ตรวจสอบหัวคอลัมน์ในชีต Order');
             }
         }
 
         function updateOverallStats(total, packed) {
-            // อนิเมชั่นเปลี่ยนตัวเลขแบบรวดเร็ว
+            total = total || 0; packed = packed || 0;
             document.getElementById('totalOrders').innerText = total.toLocaleString();
             document.getElementById('totalPacked').innerText = packed.toLocaleString();
             let remaining = total - packed;
             document.getElementById('totalRemaining').innerText = remaining.toLocaleString();
             
             let percent = total > 0 ? Math.round((packed / total) * 100) : 0;
-            document.getElementById('progressPercent text').innerText = percent + '%';
+            document.getElementById('progressPercentText').innerText = percent + '%';
             document.getElementById('progressBar').style.width = percent + '%';
         }
 
         function updateGauges(plat) {
+            if (!plat) return;
+            const blank = { p: 0, r: 0 };
             const updateG = (idBase, chartInst, dataObj) => {
+                dataObj = dataObj || blank;
                 let t = dataObj.p + dataObj.r;
                 let pct = t > 0 ? Math.round((dataObj.p / t) * 100) : 0;
                 
@@ -421,7 +540,6 @@
             updateG('Walkin', gauges.walkin, plat.WalkIN);
         }
 
-        // ฟังก์ชันอัปเดต List ขนส่ง (แบบใหม่สำหรับ TV)
         function updateCourierList(couriers) {
             const container = document.getElementById('courierList');
             container.innerHTML = '';
@@ -442,7 +560,6 @@
                 const textColor = percent === 100 ? 'text-emerald-600' : 'text-orange-600';
                 const barColor = percent === 100 ? 'bg-emerald-500' : 'bg-orange-500';
 
-                // โครงสร้างแบบแนวนอนประหยัดพื้นที่
                 const item = document.createElement('div');
                 item.className = 'flex flex-col bg-slate-50 p-3 2xl:p-4 rounded-xl border border-slate-100';
                 item.innerHTML = `
@@ -461,11 +578,9 @@
                 container.appendChild(item);
             });
             
-            // เรียกใช้ระบบ Auto Scroll
             applyAutoScroll('courierList');
         }
 
-        // ฟังก์ชันอัปเดต List คนแพ็ค (แบบใหม่สำหรับ TV)
         function updateLeaderboard(packers) {
             const container = document.getElementById('leaderboardList');
             container.innerHTML = '';
@@ -479,7 +594,6 @@
 
             sorted.forEach((item, index) => {
                 let rank = index + 1;
-                // สีเหรียญรางวัล
                 let rankStyle = 'bg-slate-100 text-slate-500 font-bold';
                 let rowStyle = 'hover:bg-slate-50';
                 
@@ -501,7 +615,6 @@
                 container.appendChild(itemDiv);
             });
             
-            // เรียกใช้ระบบ Auto Scroll
             applyAutoScroll('leaderboardList');
         }
 
@@ -519,7 +632,7 @@
                     datasets: [{
                         label: ' ยอดแพ็ค',
                         data: dataValues,
-                        borderColor: '#6366f1', // Indigo 500
+                        borderColor: '#6366f1',
                         backgroundColor: 'rgba(99, 102, 241, 0.15)',
                         borderWidth: 4,
                         fill: true,
@@ -536,7 +649,7 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: { enabled: false }, // ปิด Tooltip บนทีวี
+                        tooltip: { enabled: false },
                         datalabels: {
                             display: true,
                             color: '#4338ca',
@@ -550,7 +663,7 @@
                         y: { 
                             beginAtZero: true, 
                             grid: { color: '#f1f5f9', borderDash: [5, 5] }, 
-                            suggestedMax: Math.max(...dataValues, 10) * 1.3, // เผื่อที่ให้ Datalabel ด้านบน
+                            suggestedMax: Math.max(...dataValues, 10) * 1.3,
                             ticks: { font: { family: 'Kanit', size: 14, weight: '600' }, color: '#94a3b8' }
                         },
                         x: { 
@@ -563,26 +676,21 @@
             });
         }
 
-        // --- ระบบ Auto Scroll อัจฉริยะสำหรับ TV ---
+        // --- ระบบ Auto Scroll สำหรับ TV ---
         function applyAutoScroll(containerId) {
             const el = document.getElementById(containerId);
             if (!el) return;
             
-            // เคลียร์ Interval เก่าถ้ามี
             if(scrollIntervals[containerId]) clearInterval(scrollIntervals[containerId]);
-            
-            // รีเซ็ตตำแหน่ง
             el.scrollTop = 0;
             
-            // รอให้ Render เสร็จก่อนคำนวณความสูง
             setTimeout(() => {
-                // ถ้าข้อมูลไม่ล้นจอ ไม่ต้อง Scroll
                 if (el.scrollHeight <= el.clientHeight + 5) return;
                 
                 let scrollPos = 0;
-                let direction = 1; // 1 = ลง, -1 = ขึ้น
+                let direction = 1;
                 let isPaused = false;
-                const scrollStep = 1; // ความเร็ว
+                const scrollStep = 1;
                 
                 scrollIntervals[containerId] = setInterval(() => {
                     if(isPaused) return;
@@ -590,23 +698,21 @@
                     scrollPos += direction * scrollStep;
                     el.scrollTop = scrollPos;
                     
-                    // ถึงขอบล่าง
                     if (scrollPos >= (el.scrollHeight - el.clientHeight)) {
                         isPaused = true;
                         direction = -1;
-                        setTimeout(() => { isPaused = false; }, 3000); // พัก 3 วิ
+                        setTimeout(() => { isPaused = false; }, 3000);
                     } 
-                    // ถึงขอบบน
                     else if (scrollPos <= 0) {
                         isPaused = true;
                         direction = 1;
-                        setTimeout(() => { isPaused = false; }, 3000); // พัก 3 วิ
+                        setTimeout(() => { isPaused = false; }, 3000);
                     }
-                }, 40); // ความลื่นไหล (40ms = ~25fps)
+                }, 40);
             }, 500);
         }
 
-        function showLoading(isLoading) {
+        function showLoading(isLoading, serverTime) {
             const ind = document.getElementById('statusIndicator');
             const txt = document.getElementById('lastUpdateText');
             if (isLoading) {
@@ -618,8 +724,12 @@
                 ind.classList.replace('bg-slate-600/50', 'bg-indigo-600/50');
                 ind.classList.replace('border-slate-500/50', 'border-indigo-500/50');
                 ind.querySelector('div').className = 'w-3 h-3 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.8)]';
-                const d = new Date();
-                txt.innerText = `อัปเดต: ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
+                if (serverTime) {
+                    txt.innerText = `อัปเดต: ${serverTime}`;
+                } else {
+                    const d = new Date();
+                    txt.innerText = `อัปเดต: ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
+                }
             }
         }
 
@@ -641,7 +751,7 @@
         }
 
         function openSettings() {
-            document.getElementById('csvURL').value = currentUrl;
+            document.getElementById('csvURL').value = manualUrl;
             document.getElementById('refreshRate').value = currentRefreshRate;
             document.getElementById('pendingKeyword').value = pendingKeyword;
             document.getElementById('settingsModal').classList.remove('hidden');
@@ -653,25 +763,21 @@
 
         function saveSettings() {
             const urlInput = document.getElementById('csvURL').value.trim();
-            const urlToSave = cleanURL(urlInput);
-
-            if (urlToSave) {
-                currentUrl = urlToSave;
-                localStorage.setItem('packing_tv_csv_url', currentUrl);
-            }
+            manualUrl = urlInput ? cleanURL(urlInput) : '';   // เว้นว่าง = กลับไปโหมดไล่อัตโนมัติ
+            store.set('packing_src_url_v2', manualUrl);
+            activeIdx = 0;
             
             let rate = parseInt(document.getElementById('refreshRate').value);
-            if(rate >= 3) { // ขั้นต่ำ 3 วินาที ป้องกันเซิร์ฟเวอร์ค้าง
+            if(rate >= 3) {
                 currentRefreshRate = rate;
-                localStorage.setItem('packing_refresh_rate', currentRefreshRate);
+                store.set('packing_refresh_rate', String(currentRefreshRate));
             }
             
             pendingKeyword = document.getElementById('pendingKeyword').value.trim() || 'ยังไม่ได้แพ็ค';
-            localStorage.setItem('packing_pending_keyword', pendingKeyword);
+            store.set('packing_pending_keyword', pendingKeyword);
             
             closeSettings();
             
-            // รีเซ็ตทั้งหมดแล้วโหลดใหม่
             clearInterval(countdownTimer);
             for(let key in scrollIntervals) clearInterval(scrollIntervals[key]);
             fetchData();
@@ -680,11 +786,7 @@
         // Boot
         window.onload = () => {
             initGauges();
-            if(!currentUrl) {
-                openSettings();
-            } else {
-                fetchData();
-            }
+            fetchData();
         };
     </script>
 </body>
