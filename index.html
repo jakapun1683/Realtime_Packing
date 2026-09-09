@@ -3,249 +3,254 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Packing Dashboard</title>
+    <title>Packing Dashboard (TV Edition)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    <!-- ใช้ PapaParse สำหรับอ่านไฟล์ CSV (เสถียรที่สุด) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #f8fafc; overflow: hidden; } 
+        body { font-family: 'Kanit', sans-serif; background-color: #f1f5f9; overflow: hidden; } 
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* สไตล์สำหรับ Gauge Chart ให้ซ้อนทับ Text ตรงกลาง (แก้ปัญหาตัวหนังสือล้น) */
-        .gauge-container { position: relative; width: 100%; aspect-ratio: 2/1; display: flex; justify-content: center; align-items: flex-end; }
-        .gauge-overlay { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 5%; }
-        .gauge-percent { font-size: 3rem; font-weight: 700; line-height: 1; letter-spacing: -0.05em; margin-bottom: -0.2rem; }
-        @media (min-width: 1536px) { .gauge-percent { font-size: 4rem; } }
+        /* สไตล์สำหรับ Gauge Chart */
+        .gauge-container { position: relative; width: 100%; aspect-ratio: 1.8/1; display: flex; justify-content: center; align-items: flex-end; }
+        .gauge-overlay { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2%; }
+        .gauge-percent { font-size: 2.2rem; font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
+        @media (min-width: 1536px) { .gauge-percent { font-size: 3rem; } }
+        
+        /* อนิเมชั่นแถบความคืบหน้า */
+        .progress-bar-animated { background-size: 1rem 1rem; background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); animation: progress-stripes 1s linear infinite; }
+        @keyframes progress-stripes { from { background-position: 1rem 0; } to { background-position: 0 0; } }
     </style>
 </head>
-<body class="h-screen w-screen flex flex-col p-4 gap-4 box-border">
+<body class="h-screen w-screen flex flex-col p-3 2xl:p-5 gap-3 2xl:gap-5 box-border">
 
     <!-- Header -->
-    <div class="bg-indigo-600 rounded-2xl shadow-lg p-3 flex justify-between items-center text-white shrink-0">
-        <div class="flex items-center gap-4 ml-2">
-            <i class="fas fa-desktop text-3xl opacity-90"></i>
+    <div class="bg-indigo-700 rounded-2xl shadow-md p-3 px-5 flex justify-between items-center text-white shrink-0">
+        <div class="flex items-center gap-4">
+            <i class="fas fa-tv text-4xl text-yellow-300 drop-shadow-md"></i>
             <div>
-                <h1 class="text-2xl font-bold leading-tight">Packing Dashboard</h1>
-                <p class="text-indigo-200 text-sm">Real-time Monitoring Center (CSV Stable Version)</p>
+                <h1 class="text-3xl font-black tracking-wide leading-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-indigo-200">PACKING COMMAND CENTER</h1>
+                <p class="text-indigo-200 text-sm font-medium tracking-wider">Real-time TV Monitor (CSV Version)</p>
             </div>
         </div>
-        <div class="flex items-center gap-3">
-            <div id="statusIndicator" class="bg-indigo-500/50 px-4 py-2 rounded-full flex items-center gap-2 text-sm font-medium border border-indigo-400/30">
-                <div class="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-pulse"></div>
-                <span id="lastUpdateText">กำลังโหลดข้อมูล...</span>
+        <div class="flex items-center gap-4">
+            <div id="statusIndicator" class="bg-indigo-600/50 px-5 py-2.5 rounded-full flex items-center gap-3 text-base font-medium border border-indigo-500/50 shadow-inner">
+                <div class="w-3 h-3 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
+                <span id="lastUpdateText" class="tracking-wide">กำลังโหลดข้อมูล...</span>
             </div>
-            <button onclick="openSettings()" class="bg-indigo-500 hover:bg-indigo-400 p-2.5 rounded-xl transition-colors shadow-sm" title="ตั้งค่า">
-                <i class="fas fa-cog"></i>
-            </button>
-            <button onclick="forceRefresh()" class="bg-indigo-500 hover:bg-indigo-400 p-2.5 rounded-xl transition-colors shadow-sm" title="รีเฟรชข้อมูล">
-                <i class="fas fa-sync-alt"></i>
+            <button onclick="openSettings()" class="bg-indigo-600 hover:bg-indigo-500 p-3 rounded-xl transition-colors shadow-md border border-indigo-500">
+                <i class="fas fa-cog text-xl"></i>
             </button>
         </div>
     </div>
 
-    <div class="flex-1 flex gap-4 min-h-0">
+    <!-- Main Content Grid (3 Columns optimized for 16:9 TV) -->
+    <div class="flex-1 flex gap-3 2xl:gap-5 min-h-0">
         
-        <!-- ซ้าย: ข้อมูลรวม และ Platform (25%) -->
-        <div class="w-1/4 flex flex-col gap-4 h-full shrink-0">
-            <!-- 1. การ์ดสรุปยอดรวม -->
-            <div class="grid grid-cols-2 gap-3 shrink-0">
-                <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 border-blue-500 flex flex-col justify-center h-[100px] 2xl:h-[120px]">
-                    <p class="text-slate-500 text-sm font-medium leading-none mb-1">ออเดอร์ทั้งหมด</p>
-                    <h3 class="text-4xl 2xl:text-5xl font-bold text-slate-800" id="totalOrders">0</h3>
-                </div>
-                <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 border-emerald-500 flex flex-col justify-center h-[100px] 2xl:h-[120px]">
-                    <p class="text-slate-500 text-sm font-medium leading-none mb-1">แพ็คสำเร็จ</p>
-                    <h3 class="text-4xl 2xl:text-5xl font-bold text-emerald-600" id="totalPacked">0</h3>
-                </div>
-                <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 border-rose-500 flex flex-col justify-center h-[100px] 2xl:h-[120px]">
-                    <p class="text-slate-500 text-sm font-medium leading-none mb-1">รอแพ็ค (คงเหลือ)</p>
-                    <h3 class="text-4xl 2xl:text-5xl font-bold text-rose-600" id="totalRemaining">0</h3>
-                </div>
-                <div class="bg-white rounded-xl p-4 shadow-sm border-l-4 border-indigo-500 flex flex-col justify-center h-[100px] 2xl:h-[120px]">
-                    <div class="flex justify-between items-end mb-2">
-                        <p class="text-slate-500 text-sm font-medium leading-none">ความคืบหน้า</p>
-                        <h3 class="text-3xl 2xl:text-4xl font-bold text-indigo-600 leading-none" id="progressPercent text">0%</h3>
-                    </div>
-                    <div class="w-full bg-slate-100 rounded-full h-3">
-                        <div id="progressBar" class="bg-indigo-500 h-3 rounded-full transition-all duration-1000" style="width: 0%"></div>
-                    </div>
-                </div>
+        <!-- ================= ซ้าย: ตัวเลขสรุปผล (20%) ================= -->
+        <div class="w-1/5 flex flex-col gap-3 2xl:gap-5 h-full shrink-0">
+            <!-- ออเดอร์ทั้งหมด -->
+            <div class="flex-1 bg-white rounded-2xl shadow-md border-l-8 border-blue-500 p-4 2xl:p-6 flex flex-col justify-center relative overflow-hidden group">
+                <i class="fas fa-box-open absolute -right-4 -bottom-4 text-7xl text-blue-50 opacity-50 transform group-hover:scale-110 transition-transform"></i>
+                <p class="text-slate-500 text-lg 2xl:text-xl font-bold mb-1 z-10">ออเดอร์ทั้งหมด</p>
+                <h3 class="text-6xl 2xl:text-7xl font-black text-slate-800 tracking-tighter z-10" id="totalOrders">0</h3>
             </div>
-
-            <!-- 2. Platform (Gauge Charts) -->
-            <div class="bg-white rounded-xl p-5 shadow-sm flex-1 flex flex-col min-h-0 border border-slate-200/60">
-                <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-4 shrink-0 text-lg">
-                    <i class="fas fa-store text-indigo-500"></i> สถานะแยกตาม Platform
-                </h3>
-                <div class="grid grid-cols-2 gap-x-4 gap-y-6 flex-1 items-center content-center">
-                    <!-- Shopee -->
-                    <div class="flex flex-col items-center">
-                        <div class="gauge-container">
-                            <canvas id="gaugeShopee"></canvas>
-                            <div class="gauge-overlay text-orange-500">
-                                <span id="txtShopeePct" class="gauge-percent">0%</span>
-                            </div>
-                        </div>
-                        <div class="text-center mt-3">
-                            <p class="font-semibold text-slate-700 text-3xl 2xl:text-4xl tracking-wide">Shopee</p>
-                            <p class="text-lg 2xl:text-xl text-slate-500 mt-1">แพ็ค <span id="txtShopeeVal" class="font-medium text-slate-600">0 / 0</span></p>
-                        </div>
-                    </div>
-                    <!-- TikTok -->
-                    <div class="flex flex-col items-center">
-                        <div class="gauge-container">
-                            <canvas id="gaugeTiktok"></canvas>
-                            <div class="gauge-overlay text-emerald-500">
-                                <span id="txtTiktokPct" class="gauge-percent">0%</span>
-                            </div>
-                        </div>
-                        <div class="text-center mt-3">
-                            <p class="font-semibold text-slate-700 text-3xl 2xl:text-4xl tracking-wide">TikTok</p>
-                            <p class="text-lg 2xl:text-xl text-slate-500 mt-1">แพ็ค <span id="txtTiktokVal" class="font-medium text-slate-600">0 / 0</span></p>
-                        </div>
-                    </div>
-                    <!-- Lazada -->
-                    <div class="flex flex-col items-center">
-                        <div class="gauge-container">
-                            <canvas id="gaugeLazada"></canvas>
-                            <div class="gauge-overlay text-blue-600">
-                                <span id="txtLazadaPct" class="gauge-percent">0%</span>
-                            </div>
-                        </div>
-                        <div class="text-center mt-3">
-                            <p class="font-semibold text-slate-700 text-3xl 2xl:text-4xl tracking-wide">Lazada</p>
-                            <p class="text-lg 2xl:text-xl text-slate-500 mt-1">แพ็ค <span id="txtLazadaVal" class="font-medium text-slate-600">0 / 0</span></p>
-                        </div>
-                    </div>
-                    <!-- Walk IN -->
-                    <div class="flex flex-col items-center">
-                        <div class="gauge-container">
-                            <canvas id="gaugeWalkin"></canvas>
-                            <div class="gauge-overlay text-slate-600">
-                                <span id="txtWalkinPct" class="gauge-percent">0%</span>
-                            </div>
-                        </div>
-                        <div class="text-center mt-3">
-                            <p class="font-semibold text-slate-700 text-3xl 2xl:text-4xl tracking-wide">Walk IN</p>
-                            <p class="text-lg 2xl:text-xl text-slate-500 mt-1">แพ็ค <span id="txtWalkinVal" class="font-medium text-slate-600">0 / 0</span></p>
-                        </div>
-                    </div>
+            
+            <!-- แพ็คสำเร็จ -->
+            <div class="flex-1 bg-white rounded-2xl shadow-md border-l-8 border-emerald-500 p-4 2xl:p-6 flex flex-col justify-center relative overflow-hidden group">
+                <i class="fas fa-check-circle absolute -right-4 -bottom-4 text-7xl text-emerald-50 opacity-50 transform group-hover:scale-110 transition-transform"></i>
+                <p class="text-slate-500 text-lg 2xl:text-xl font-bold mb-1 z-10">แพ็คสำเร็จแล้ว</p>
+                <h3 class="text-6xl 2xl:text-7xl font-black text-emerald-600 tracking-tighter z-10" id="totalPacked">0</h3>
+            </div>
+            
+            <!-- รอแพ็ค -->
+            <div class="flex-1 bg-white rounded-2xl shadow-md border-l-8 border-rose-500 p-4 2xl:p-6 flex flex-col justify-center relative overflow-hidden group">
+                <i class="fas fa-clock absolute -right-4 -bottom-4 text-7xl text-rose-50 opacity-50 transform group-hover:scale-110 transition-transform"></i>
+                <p class="text-slate-500 text-lg 2xl:text-xl font-bold mb-1 z-10">รอแพ็ค (คงเหลือ)</p>
+                <h3 class="text-6xl 2xl:text-7xl font-black text-rose-600 tracking-tighter z-10" id="totalRemaining">0</h3>
+            </div>
+            
+            <!-- ความคืบหน้า -->
+            <div class="flex-1 bg-slate-800 rounded-2xl shadow-lg border border-slate-700 p-4 2xl:p-6 flex flex-col justify-center relative overflow-hidden">
+                <div class="flex justify-between items-end mb-3">
+                    <p class="text-slate-300 text-lg 2xl:text-xl font-bold">ความคืบหน้า</p>
+                    <h3 class="text-4xl 2xl:text-5xl font-black text-white leading-none tracking-tighter" id="progressPercent text">0%</h3>
+                </div>
+                <div class="w-full bg-slate-900 rounded-full h-4 2xl:h-5 shadow-inner p-1">
+                    <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-1000 progress-bar-animated shadow-[0_0_10px_rgba(99,102,241,0.5)]" style="width: 0%"></div>
                 </div>
             </div>
         </div>
 
-        <!-- ขวา: ขนส่ง (บน 100%), ล่าง: Peak Time (60%) + Leaderboard (40%) -->
-        <div class="flex-1 flex flex-col gap-4 h-full min-w-0">
+        <!-- ================= กลาง: Platform & Peak Time (50%) ================= -->
+        <div class="w-1/2 flex flex-col gap-3 2xl:gap-5 h-full shrink-0">
+            <!-- Platform Gauges -->
+            <div class="bg-white rounded-2xl p-4 2xl:p-5 shadow-md flex flex-col shrink-0 h-[40%] border border-slate-200/60">
+                <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 text-xl">
+                    <i class="fas fa-layer-group text-indigo-500"></i> สัดส่วนออเดอร์แยกตาม Platform
+                </h3>
+                <div class="grid grid-cols-4 gap-2 2xl:gap-4 flex-1 items-center">
+                    <!-- Shopee -->
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
+                        <div class="gauge-container mb-2 w-full max-w-[180px]">
+                            <canvas id="gaugeShopee"></canvas>
+                            <div class="gauge-overlay text-orange-500"><span id="txtShopeePct" class="gauge-percent">0%</span></div>
+                        </div>
+                        <div class="text-center w-full">
+                            <p class="font-black text-slate-800 text-lg 2xl:text-xl tracking-wider">SHOPEE</p>
+                            <div class="bg-orange-100 text-orange-800 font-bold text-sm 2xl:text-base px-2 py-0.5 rounded mt-1 truncate w-full" id="txtShopeeVal">0 / 0</div>
+                        </div>
+                    </div>
+                    <!-- TikTok -->
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
+                        <div class="gauge-container mb-2 w-full max-w-[180px]">
+                            <canvas id="gaugeTiktok"></canvas>
+                            <div class="gauge-overlay text-black"><span id="txtTiktokPct" class="gauge-percent">0%</span></div>
+                        </div>
+                        <div class="text-center w-full">
+                            <p class="font-black text-slate-800 text-lg 2xl:text-xl tracking-wider">TIKTOK</p>
+                            <div class="bg-slate-200 text-black font-bold text-sm 2xl:text-base px-2 py-0.5 rounded mt-1 truncate w-full" id="txtTiktokVal">0 / 0</div>
+                        </div>
+                    </div>
+                    <!-- Lazada -->
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
+                        <div class="gauge-container mb-2 w-full max-w-[180px]">
+                            <canvas id="gaugeLazada"></canvas>
+                            <div class="gauge-overlay text-blue-600"><span id="txtLazadaPct" class="gauge-percent">0%</span></div>
+                        </div>
+                        <div class="text-center w-full">
+                            <p class="font-black text-slate-800 text-lg 2xl:text-xl tracking-wider">LAZADA</p>
+                            <div class="bg-blue-100 text-blue-800 font-bold text-sm 2xl:text-base px-2 py-0.5 rounded mt-1 truncate w-full" id="txtLazadaVal">0 / 0</div>
+                        </div>
+                    </div>
+                    <!-- WalkIN -->
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
+                        <div class="gauge-container mb-2 w-full max-w-[180px]">
+                            <canvas id="gaugeWalkin"></canvas>
+                            <div class="gauge-overlay text-emerald-500"><span id="txtWalkinPct" class="gauge-percent">0%</span></div>
+                        </div>
+                        <div class="text-center w-full">
+                            <p class="font-black text-slate-800 text-lg 2xl:text-xl tracking-wider">LINE/OTHER</p>
+                            <div class="bg-emerald-100 text-emerald-800 font-bold text-sm 2xl:text-base px-2 py-0.5 rounded mt-1 truncate w-full" id="txtWalkinVal">0 / 0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Peak Time Chart -->
+            <div class="bg-white rounded-2xl p-4 2xl:p-6 shadow-md border border-slate-200/60 flex-1 flex flex-col min-h-0 relative">
+                <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 text-xl shrink-0">
+                    <i class="fas fa-chart-area text-indigo-500"></i> แนวโน้มการแพ็คออเดอร์ (Peak Time)
+                </h3>
+                <div class="flex-1 min-h-0 relative mt-2 w-full h-full">
+                    <canvas id="peakTimeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= ขวา: ขนส่ง & คนแพ็ค (30%) ================= -->
+        <div class="flex-1 flex flex-col gap-3 2xl:gap-5 h-full min-w-0">
             
-            <!-- 3. ขนส่ง (กินพื้นที่ด้านบนกว้างเต็มจอ 75%) -->
-            <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200/60 flex flex-col h-[55%] shrink-0">
-                <div class="flex justify-between items-center mb-4 shrink-0">
+            <!-- ขนส่ง (Compact List) -->
+            <div class="bg-white rounded-2xl p-4 2xl:p-5 shadow-md border border-slate-200/60 flex flex-col h-[55%] shrink-0 relative overflow-hidden">
+                <div class="flex justify-between items-center mb-3 shrink-0 border-b border-slate-100 pb-2">
                     <h3 class="text-slate-800 font-bold flex items-center gap-2 text-xl">
                         <i class="fas fa-truck-fast text-orange-500"></i> สถานะแยกตามขนส่ง
                     </h3>
-                    <span class="bg-orange-100 text-orange-700 text-sm font-bold px-4 py-1.5 rounded-full" id="courierCount">0 ขนส่ง</span>
+                    <span class="bg-orange-100 text-orange-700 text-base font-bold px-3 py-1 rounded-full" id="courierCount">0 ขนส่ง</span>
                 </div>
-                <!-- Grid 4 คอลัมน์ รองรับชื่อเต็ม 2 บรรทัดและตัวเลขใหญ่ -->
-                <div id="courierCards" class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto hide-scrollbar pb-2 flex-1 content-start">
-                    <!-- Cards สร้างด้วย JS -->
+                <!-- Container แบบเลื่อนอัตโนมัติ -->
+                <div id="courierList" class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-4 pr-1 scroll-smooth pb-4">
+                    <!-- List สร้างด้วย JS -->
                 </div>
+                <!-- Fade effect ด้านล่าง -->
+                <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none rounded-b-2xl"></div>
             </div>
 
-            <!-- แถวล่าง: Peak Time (ซ้าย) + คนแพ็ค (ขวา) -->
-            <div class="flex gap-4 flex-1 min-h-0">
-                <!-- 4. Peak Time Chart -->
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200/60 flex-1 flex flex-col min-w-0">
-                    <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 shrink-0 text-lg">
-                        <i class="fas fa-chart-line text-orange-500"></i> ช่วงเวลาที่มีการแพ็คสูงสุด (Peak Time)
+            <!-- ผลงานคนแพ็ค (Compact List) -->
+            <div class="bg-white rounded-2xl p-4 2xl:p-5 shadow-md border border-slate-200/60 flex-1 flex flex-col min-h-0 relative overflow-hidden">
+                <div class="flex justify-between items-center mb-3 shrink-0 border-b border-slate-100 pb-2">
+                    <h3 class="text-slate-800 font-bold flex items-center gap-2 text-xl">
+                        <i class="fas fa-ranking-star text-yellow-500"></i> ผลงานคนแพ็ค (Top Packers)
                     </h3>
-                    <div class="flex-1 min-h-0 relative">
-                        <canvas id="peakTimeChart"></canvas>
-                    </div>
                 </div>
-
-                <!-- 5. ผลงานคนแพ็ค (Leaderboard มาอยู่ล่างขวา) -->
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200/60 w-1/3 xl:w-2/5 flex flex-col shrink-0 min-w-0">
-                    <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-4 shrink-0 text-lg">
-                        <i class="fas fa-users-rays text-emerald-500"></i> ผลงานการแพ็ครายบุคคล (Top 20)
-                    </h3>
-                    <div id="leaderboardContainer" class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-3 pr-2">
-                        <!-- Leaderboard cards สร้างด้วย JS -->
-                    </div>
+                <!-- Container แบบเลื่อนอัตโนมัติ -->
+                <div id="leaderboardList" class="flex-1 overflow-y-auto hide-scrollbar flex flex-col gap-1 pr-1 scroll-smooth pb-4">
+                    <!-- List สร้างด้วย JS -->
                 </div>
+                 <!-- Fade effect ด้านล่าง -->
+                 <div class="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white to-transparent pointer-events-none rounded-b-2xl"></div>
             </div>
-
+            
         </div>
     </div>
 
     <!-- Settings Modal -->
-    <div id="settingsModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden z-50 flex items-center justify-center transition-opacity">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden transform transition-all">
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden z-50 flex items-center justify-center transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4 overflow-hidden">
             <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center">
-                <h2 class="text-xl font-bold text-white"><i class="fas fa-cog mr-2"></i> ตั้งค่าการดึงข้อมูล (CSV)</h2>
+                <h2 class="text-xl font-bold text-white"><i class="fas fa-file-csv mr-2"></i> ตั้งค่าการดึงข้อมูล (CSV)</h2>
                 <button onclick="closeSettings()" class="text-indigo-200 hover:text-white transition-colors"><i class="fas fa-times text-2xl"></i></button>
             </div>
             <div class="p-6 space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-1">ลิงก์ CSV จาก Google Sheets *</label>
-                    <input type="text" id="gsURL" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
-                    <p class="text-xs text-slate-500 mt-2 font-medium"><i class="fas fa-info-circle"></i> ใช้ลิงก์จาก: ไฟล์ (File) > แชร์ (Share) > เผยแพร่ไปยังเว็บ (Publish to web) > เลือกเป็น .csv</p>
+                    <label class="block text-base font-bold text-slate-700 mb-1">ลิงก์ CSV จาก Google Sheets *</label>
+                    <input type="text" id="csvURL" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-base rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv">
+                    <p class="text-sm text-slate-500 mt-2 font-medium"><i class="fas fa-info-circle"></i> ใช้ลิงก์จาก: ไฟล์ > แชร์ > เผยแพร่ไปยังเว็บ > เลือกเป็น .csv</p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">ความถี่อัปเดต (วินาที)</label>
-                        <input type="number" id="refreshRate" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" value="10">
+                        <label class="block text-base font-bold text-slate-700 mb-1">ความถี่อัปเดต (วินาที)</label>
+                        <input type="number" id="refreshRate" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-base rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" value="5">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">คำที่ใช้นับว่า "รอแพ็ค"</label>
-                        <input type="text" id="pendingKeyword" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" value="ยังไม่ได้แพ็ค">
+                        <label class="block text-base font-bold text-slate-700 mb-1">คำที่แปลว่า "รอแพ็ค"</label>
+                        <input type="text" id="pendingKeyword" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-base rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" value="ยังไม่ได้แพ็ค">
                     </div>
                 </div>
             </div>
             <div class="bg-slate-50 px-6 py-4 flex justify-end gap-3 border-t">
-                <button onclick="closeSettings()" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-200 transition-colors">ยกเลิก</button>
-                <button onclick="saveSettings()" class="px-5 py-2.5 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md transition-all">บันทึก & รีโหลด</button>
+                <button onclick="closeSettings()" class="px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-200 transition-colors">ยกเลิก</button>
+                <button onclick="saveSettings()" class="px-6 py-3 rounded-xl font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md transition-all text-lg">บันทึก & รีโหลด</button>
             </div>
         </div>
     </div>
 
     <!-- Error Alert -->
-    <div id="errorAlert" class="fixed bottom-4 left-4 right-4 md:right-auto bg-rose-100 border-l-4 border-rose-500 text-rose-800 p-4 rounded-xl shadow-xl hidden z-50 md:max-w-md animate-bounce">
-        <div class="flex items-start">
-            <i class="fas fa-exclamation-circle text-2xl mt-0.5 mr-3 text-rose-600"></i>
-            <div class="flex-1">
-                <h3 class="font-bold text-lg">เกิดข้อผิดพลาดในการดึงข้อมูล</h3>
-                <p id="errorMsg" class="text-sm mt-1 whitespace-pre-line leading-relaxed font-medium"></p>
-            </div>
-            <button onclick="document.getElementById('errorAlert').classList.add('hidden')" class="ml-auto text-rose-500 hover:text-rose-700 p-1"><i class="fas fa-times text-xl"></i></button>
+    <div id="errorAlert" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-rose-600 text-white p-4 px-6 rounded-full shadow-2xl hidden z-50 animate-bounce flex items-center gap-3">
+        <i class="fas fa-exclamation-triangle text-2xl text-yellow-300"></i>
+        <div>
+            <h3 class="font-bold text-lg leading-tight">เกิดข้อผิดพลาดในการดึงข้อมูล</h3>
+            <p id="errorMsg" class="text-sm font-medium opacity-90"></p>
         </div>
+        <button onclick="document.getElementById('errorAlert').classList.add('hidden')" class="ml-4 text-white hover:text-rose-200"><i class="fas fa-times text-xl"></i></button>
     </div>
 
     <script>
-        // เปิดใช้งาน Datalabels สำหรับ Chart.js
         Chart.register(ChartDataLabels);
 
-        // ลิงก์ล่าสุดที่คุณให้มา เป็นค่าเริ่มต้นเลยครับ
+        // ดึงค่าการตั้งค่าจาก LocalStorage
         const defaultCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRs1280kImEMoT9txLP_sklmqa3PUGuWpLrzERwx3AdkyAUjC7K5ItmC0OhcqxSsJYydQpwKzMFtTXr/pub?gid=1174887101&single=true&output=csv';
-        
-        // ล้างความทรงจำลิงก์ API เก่าทิ้ง เพื่อบังคับให้ใช้ CSV แน่นอน
-        let currentUrl = localStorage.getItem('packing_csv_url');
-        if (!currentUrl || currentUrl.includes('script.google.com') || currentUrl.includes('exec') || !currentUrl.includes('output=csv')) {
+        let currentUrl = localStorage.getItem('packing_tv_csv_url');
+        if (!currentUrl || !currentUrl.includes('output=csv')) {
             currentUrl = defaultCsvUrl;
-            localStorage.setItem('packing_csv_url', currentUrl);
         }
-
-        let currentRefreshRate = parseInt(localStorage.getItem('packing_refresh_rate')) || 10;
+        
+        let currentRefreshRate = parseInt(localStorage.getItem('packing_refresh_rate')) || 5;
         let pendingKeyword = localStorage.getItem('packing_pending_keyword') || 'ยังไม่ได้แพ็ค';
         
         let countdownTimer;
         let gauges = {};
         let peakChartInst = null;
+        
+        // ตัวแปรสำหรับ Auto Scroll
+        let scrollIntervals = {};
 
+        // การตั้งค่า Gauge Chart ให้เหมาะกับ TV
         const gaugeOptions = {
             type: 'doughnut',
             options: {
@@ -253,13 +258,13 @@
                 maintainAspectRatio: false,
                 circumference: 180,
                 rotation: -90,
-                cutout: '78%', // เพรียวบางขึ้นเพื่อเว้นที่ให้ตัวหนังสือ HTML
+                cutout: '75%', // หนาขึ้นนิดนึงให้เห็นสีชัดๆบนทีวี
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: false },
-                    datalabels: { display: false } // ปิด Datalabel เดิมเพราะเราใช้ HTML Overlay แทนแล้ว
+                    datalabels: { display: false } 
                 },
-                animation: { duration: 500 }
+                animation: { duration: 800, easing: 'easeOutQuart' }
             }
         };
 
@@ -270,60 +275,57 @@
                     ...gaugeOptions,
                     data: {
                         labels: ['Packed', 'Remaining'],
-                        datasets: [{ data: [0, 100], backgroundColor: [color, '#f1f5f9'], borderWidth: 0, borderRadius: [10, 0] }]
+                        datasets: [{ data: [0, 100], backgroundColor: [color, '#e2e8f0'], borderWidth: 0, borderRadius: [10, 0] }]
                     }
                 });
             };
-            gauges.shopee = createGauge('gaugeShopee', '#f97316');
-            gauges.tiktok = createGauge('gaugeTiktok', '#10b981');
-            gauges.lazada = createGauge('gaugeLazada', '#2563eb');
-            gauges.walkin = createGauge('gaugeWalkin', '#475569');
+            gauges.shopee = createGauge('gaugeShopee', '#f97316'); // Shopee Orange
+            gauges.tiktok = createGauge('gaugeTiktok', '#000000'); // Tiktok Black
+            gauges.lazada = createGauge('gaugeLazada', '#2563eb'); // Lazada Blue
+            gauges.walkin = createGauge('gaugeWalkin', '#10b981'); // Line Green
         }
 
         function cleanURL(url) {
             if (!url) return '';
-            let cleaned = url.replace(/^[\[\(]+|[\]\)]+$/g, ''); 
-            cleaned = cleaned.trim();
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            const match = cleaned.match(urlRegex);
-            return match ? match[0] : cleaned;
+            return url.replace(/^[\[\(]+|[\]\)]+$/g, '').trim().match(/(https?:\/\/[^\s]+)/g)?.[0] || url;
         }
 
         function fetchData() {
             showLoading(true);
             const urlToFetch = cleanURL(currentUrl);
             
-            // แก้ไขการเช็คลิงก์ให้ฉลาดขึ้น แค่มีคำว่า output=csv ก็ถือว่าผ่าน
             if (!urlToFetch || !urlToFetch.toLowerCase().includes('output=csv')) {
                 showError("กรุณาตรวจสอบลิงก์อีกครั้ง! ระบบรองรับเฉพาะลิงก์ CSV (Publish to web) เท่านั้น");
                 showLoading(false);
-                startCountdown();
+                if(!currentUrl) openSettings();
                 return;
             }
 
-            Papa.parse(urlToFetch, {
+            // ทริคความไว: เพิ่ม Timestamp หลอกเบราว์เซอร์ไม่ให้จำ Cache (โหลดข้อมูลใหม่เสมอ)
+            const timeStamp = new Date().getTime();
+            const noCacheUrl = urlToFetch + (urlToFetch.includes('?') ? '&' : '?') + 'cb=' + timeStamp;
+
+            Papa.parse(noCacheUrl, {
                 download: true,
                 header: true,
                 skipEmptyLines: true,
                 complete: function(results) {
                     document.getElementById('errorAlert').classList.add('hidden');
-                    processData(results.data, results.meta.fields);
+                    processData(results.data);
                     showLoading(false);
                     startCountdown();
                 },
                 error: function(error) {
                     console.error("PapaParse Fetch Error:", error);
-                    showError("ดาวน์โหลด CSV ล้มเหลว! \nโปรดตรวจสอบว่าเปิด Publish to web ถูกต้องแล้วหรือไม่");
+                    showError("ดาวน์โหลด CSV ล้มเหลว! โปรดตรวจสอบการตั้งค่า Publish to web");
                     showLoading(false);
                     startCountdown();
                 }
             });
         }
 
-        function processData(data, headers) {
+        function processData(data) {
             try {
-                if(!headers || headers.length < 5) throw new Error("รูปแบบคอลัมน์ไม่ถูกต้อง กรุณาเช็ค Google Sheet");
-
                 let total = 0, packed = 0;
                 let platforms = {
                     'Shopee': {p:0, r:0}, 'Tiktok': {p:0, r:0}, 
@@ -333,21 +335,17 @@
                 let packers = {};
                 let peakTimes = {};
 
-                const colPlatform = headers[0];
-                const colCourier = headers[1];
-                const colStatus = headers[4]; 
-                const colTime = headers[6];   
-
+                // อ่านข้อมูลแต่ละแถว โดยอ้างอิง Key ตรงกับชื่อ Header ในชีตของคุณ
                 data.forEach(row => {
-                    let statusStr = (row[colStatus] || '').toString().trim();
-                    if (statusStr === '') return; 
+                    let statusStr = (row['Station'] || '').toString().trim();
+                    if (statusStr === '') return; // ข้ามบรรทัดว่าง
 
                     total++;
                     const isPacked = statusStr !== pendingKeyword;
                     if (isPacked) packed++;
 
-                    // 1. Platform
-                    let rawP = (row[colPlatform] || '').toString().toLowerCase();
+                    // 1. Platform (คอลัมน์ Source)
+                    let rawP = (row['Source'] || '').toString().toLowerCase();
                     let group = 'WalkIN';
                     if (rawP.includes('shopee')) group = 'Shopee';
                     else if (rawP.includes('tiktok')) group = 'Tiktok';
@@ -356,21 +354,21 @@
                     if (isPacked) platforms[group].p++;
                     else platforms[group].r++;
 
-                    // 2. Courier (โชว์ชื่อเต็ม ไม่มีการตัดทิ้ง)
-                    let cName = (row[colCourier] || '').toString().trim() || 'ไม่ระบุขนส่ง';
+                    // 2. ขนส่ง (คอลัมน์ Delivery By)
+                    let cName = (row['Delivery By'] || '').toString().trim() || 'ไม่ระบุ';
                     if (!couriers[cName]) couriers[cName] = { packed: 0, remaining: 0 };
                     if (isPacked) couriers[cName].packed++;
                     else couriers[cName].remaining++;
 
-                    // 3. Packer
+                    // 3. คนแพ็ค (คอลัมน์ Station)
                     if (isPacked) {
                         if (!packers[statusStr]) packers[statusStr] = 0;
                         packers[statusStr]++;
                     }
 
-                    // 4. Peak Time
+                    // 4. Peak Time (คอลัมน์ Time)
                     if (isPacked) {
-                        let timeStr = (row[colTime] || '').toString().trim();
+                        let timeStr = (row['Time'] || '').toString().trim();
                         if (timeStr) {
                             let hour = timeStr.split(':')[0];
                             if (!isNaN(hour) && hour !== '') {
@@ -381,19 +379,21 @@
                     }
                 });
 
+                // อัปเดต UI ชิ้นต่างๆ
                 updateOverallStats(total, packed);
                 updateGauges(platforms);
-                updateCourierCards(couriers);
+                updateCourierList(couriers);
                 updateLeaderboard(packers);
                 updatePeakTimeChart(peakTimes);
                 
             } catch (e) {
-                console.error("Data Map Error:", e);
-                showError("พบข้อผิดพลาดในการคำนวณข้อมูล (หน้าตาชีตอาจเปลี่ยนไป)\nรายละเอียด: " + e.message);
+                console.error("Processing Error:", e);
+                showError("รูปแบบข้อมูลไม่ตรงกัน โปรดตรวจสอบหัวคอลัมน์ใน Google Sheet");
             }
         }
 
         function updateOverallStats(total, packed) {
+            // อนิเมชั่นเปลี่ยนตัวเลขแบบรวดเร็ว
             document.getElementById('totalOrders').innerText = total.toLocaleString();
             document.getElementById('totalPacked').innerText = packed.toLocaleString();
             let remaining = total - packed;
@@ -421,8 +421,9 @@
             updateG('Walkin', gauges.walkin, plat.WalkIN);
         }
 
-        function updateCourierCards(couriers) {
-            const container = document.getElementById('courierCards');
+        // ฟังก์ชันอัปเดต List ขนส่ง (แบบใหม่สำหรับ TV)
+        function updateCourierList(couriers) {
+            const container = document.getElementById('courierList');
             container.innerHTML = '';
             
             let sortedCouriers = Object.keys(couriers).sort((a, b) => {
@@ -439,68 +440,69 @@
                 let percent = total > 0 ? Math.round((d.packed / total) * 100) : 0;
                 
                 const textColor = percent === 100 ? 'text-emerald-600' : 'text-orange-600';
-                const bgColor = percent === 100 ? 'bg-emerald-50/40' : 'bg-slate-50/50';
-                const borderColor = percent === 100 ? 'border-emerald-300' : 'border-slate-200';
                 const barColor = percent === 100 ? 'bg-emerald-500' : 'bg-orange-500';
 
-                const card = document.createElement('div');
-                // เพิ่มความสูงการ์ด และจัด Padding เพื่อให้ชื่อเต็มและตัวเลขที่ใหญ่ขึ้นดูสวยงาม
-                card.className = `${bgColor} border ${borderColor} rounded-xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col justify-between h-[120px] md:h-[130px] relative overflow-hidden group`;
-                
-                card.innerHTML = `
-                    <div class="absolute left-0 top-0 bottom-0 w-1.5 ${barColor}"></div>
-                    <!-- ชื่อขนส่งเต็มๆ Line-clamp-2 โชว์ได้สูงสุด 2 บรรทัด -->
-                    <p class="font-bold text-slate-800 text-lg md:text-xl line-clamp-2 leading-tight ml-3 z-10" title="${c}">
-                        ${c}
-                    </p>
-                    <div class="ml-3 z-10 mt-2">
-                        <div class="flex justify-between items-end mb-1.5">
-                            <!-- ตัวเลขยอดแพ็คใหญ่ๆ มองเห็นชัดๆ ปรับความหนาลงให้อ่านง่าย -->
-                            <div class="font-bold text-slate-800 text-3xl 2xl:text-4xl tracking-tight leading-none">
-                                ${d.packed.toLocaleString()} <span class="text-sm md:text-base text-slate-400 font-semibold">/${total.toLocaleString()}</span>
-                            </div>
-                            <div class="font-bold ${textColor} text-xl">${percent}%</div>
-                        </div>
-                        <div class="w-full bg-slate-200 rounded-full h-2">
-                            <div class="${barColor} h-2 rounded-full transition-all duration-1000" style="width: ${percent}%"></div>
+                // โครงสร้างแบบแนวนอนประหยัดพื้นที่
+                const item = document.createElement('div');
+                item.className = 'flex flex-col bg-slate-50 p-3 2xl:p-4 rounded-xl border border-slate-100';
+                item.innerHTML = `
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="font-bold text-slate-700 text-lg 2xl:text-xl truncate max-w-[65%]" title="${c}">${c}</span>
+                        <div class="text-right leading-none">
+                            <span class="font-black ${textColor} text-2xl 2xl:text-3xl">${d.packed.toLocaleString()}</span>
+                            <span class="text-base 2xl:text-lg text-slate-400 font-bold ml-1">/ ${total.toLocaleString()}</span>
+                            <span class="ml-2 font-bold bg-white px-2 py-0.5 rounded text-slate-600 text-sm border shadow-sm">${percent}%</span>
                         </div>
                     </div>
+                    <div class="w-full bg-slate-200 h-2 2xl:h-2.5 rounded-full overflow-hidden">
+                        <div class="${barColor} h-full transition-all duration-1000 ${percent > 0 && percent < 100 ? 'progress-bar-animated' : ''}" style="width: ${percent}%"></div>
+                    </div>
                 `;
-                container.appendChild(card);
+                container.appendChild(item);
             });
+            
+            // เรียกใช้ระบบ Auto Scroll
+            applyAutoScroll('courierList');
         }
 
+        // ฟังก์ชันอัปเดต List คนแพ็ค (แบบใหม่สำหรับ TV)
         function updateLeaderboard(packers) {
-            const container = document.getElementById('leaderboardContainer');
+            const container = document.getElementById('leaderboardList');
             container.innerHTML = '';
             
             let sorted = Object.entries(packers).sort((a, b) => b[1] - a[1]);
             
             if(sorted.length === 0) {
-                container.innerHTML = `<p class="text-slate-400 text-center py-6 font-medium">ยังไม่มีข้อมูลผลงาน</p>`;
+                container.innerHTML = `<p class="text-slate-400 text-center py-4 font-medium">ยังไม่มีข้อมูล</p>`;
                 return;
             }
 
-            sorted.slice(0, 20).forEach((item, index) => {
+            sorted.forEach((item, index) => {
                 let rank = index + 1;
-                let badgeClass = 'bg-slate-200 text-slate-600 border border-slate-300';
-                if (rank === 1) badgeClass = 'bg-yellow-100 text-yellow-600 border-yellow-300 shadow-sm';
-                else if (rank === 2) badgeClass = 'bg-slate-100 text-slate-700 border-slate-400 shadow-sm';
-                else if (rank === 3) badgeClass = 'bg-orange-100 text-orange-700 border-orange-300 shadow-sm';
+                // สีเหรียญรางวัล
+                let rankStyle = 'bg-slate-100 text-slate-500 font-bold';
+                let rowStyle = 'hover:bg-slate-50';
+                
+                if (rank === 1) { rankStyle = 'bg-gradient-to-br from-yellow-300 to-yellow-500 text-white shadow-md font-black scale-110'; rowStyle = 'bg-yellow-50/50 border-l-4 border-yellow-400'; }
+                else if (rank === 2) { rankStyle = 'bg-gradient-to-br from-slate-300 to-slate-400 text-white shadow-md font-black'; rowStyle = 'bg-slate-50/80 border-l-4 border-slate-300'; }
+                else if (rank === 3) { rankStyle = 'bg-gradient-to-br from-orange-300 to-orange-500 text-white shadow-md font-black'; rowStyle = 'bg-orange-50/30 border-l-4 border-orange-300'; }
 
-                const div = document.createElement('div');
-                div.className = `flex items-center justify-between p-4 rounded-xl border border-slate-100 ${rank <= 3 ? 'bg-white shadow-sm' : 'bg-slate-50'}`;
-                div.innerHTML = `
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl ${badgeClass}">
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `flex items-center justify-between p-3 2xl:p-4 rounded-xl transition-colors border border-transparent ${rowStyle}`;
+                itemDiv.innerHTML = `
+                    <div class="flex items-center gap-4 w-[75%]">
+                        <div class="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full flex items-center justify-center text-lg 2xl:text-xl shrink-0 ${rankStyle}">
                             ${rank}
                         </div>
-                        <span class="font-bold text-slate-800 text-xl 2xl:text-2xl">${item[0]}</span>
+                        <span class="font-bold text-slate-700 text-xl 2xl:text-2xl truncate">${item[0]}</span>
                     </div>
-                    <span class="font-bold text-indigo-600 text-4xl 2xl:text-5xl tracking-tight">${item[1].toLocaleString()}</span>
+                    <span class="font-black text-indigo-600 text-3xl 2xl:text-4xl tracking-tighter">${item[1].toLocaleString()}</span>
                 `;
-                container.appendChild(div);
+                container.appendChild(itemDiv);
             });
+            
+            // เรียกใช้ระบบ Auto Scroll
+            applyAutoScroll('leaderboardList');
         }
 
         function updatePeakTimeChart(peakData) {
@@ -515,18 +517,18 @@
                 data: {
                     labels: sortedHours,
                     datasets: [{
-                        label: 'ยอดแพ็คออเดอร์',
+                        label: ' ยอดแพ็ค',
                         data: dataValues,
-                        borderColor: '#f97316',
-                        backgroundColor: 'rgba(249, 115, 22, 0.15)',
-                        borderWidth: 3,
+                        borderColor: '#6366f1', // Indigo 500
+                        backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                        borderWidth: 4,
                         fill: true,
                         tension: 0.4,
                         pointBackgroundColor: '#fff',
-                        pointBorderColor: '#f97316',
-                        pointBorderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 7
+                        pointBorderColor: '#6366f1',
+                        pointBorderWidth: 3,
+                        pointRadius: 6,
+                        pointHoverRadius: 8
                     }]
                 },
                 options: {
@@ -534,53 +536,90 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: { 
-                            mode: 'index', 
-                            intersect: false,
-                            titleFont: { family: 'Kanit', size: 14 },
-                            bodyFont: { family: 'Kanit', size: 14, weight: 'bold' }
-                        },
+                        tooltip: { enabled: false }, // ปิด Tooltip บนทีวี
                         datalabels: {
                             display: true,
-                            color: '#c2410c',
-                            font: { family: 'Kanit', weight: 'bold', size: 14 },
+                            color: '#4338ca',
+                            font: { family: 'Kanit', weight: '900', size: window.innerWidth > 1536 ? 20 : 16 },
                             align: 'top',
-                            offset: 8,
+                            offset: 10,
                             formatter: (value) => value > 0 ? value : ''
                         }
                     },
                     scales: {
                         y: { 
                             beginAtZero: true, 
-                            grid: { borderDash: [5, 5], color: '#e2e8f0' }, 
-                            suggestedMax: Math.max(...dataValues, 10) * 1.2,
-                            ticks: { font: { family: 'Kanit', size: 12 } }
+                            grid: { color: '#f1f5f9', borderDash: [5, 5] }, 
+                            suggestedMax: Math.max(...dataValues, 10) * 1.3, // เผื่อที่ให้ Datalabel ด้านบน
+                            ticks: { font: { family: 'Kanit', size: 14, weight: '600' }, color: '#94a3b8' }
                         },
                         x: { 
                             grid: { display: false },
-                            ticks: { font: { family: 'Kanit', size: 13, weight: 'bold' } }
+                            ticks: { font: { family: 'Kanit', size: window.innerWidth > 1536 ? 16 : 14, weight: 'bold' }, color: '#64748b' }
                         }
-                    }
+                    },
+                    layout: { padding: { top: 20 } }
                 }
             });
+        }
+
+        // --- ระบบ Auto Scroll อัจฉริยะสำหรับ TV ---
+        function applyAutoScroll(containerId) {
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            
+            // เคลียร์ Interval เก่าถ้ามี
+            if(scrollIntervals[containerId]) clearInterval(scrollIntervals[containerId]);
+            
+            // รีเซ็ตตำแหน่ง
+            el.scrollTop = 0;
+            
+            // รอให้ Render เสร็จก่อนคำนวณความสูง
+            setTimeout(() => {
+                // ถ้าข้อมูลไม่ล้นจอ ไม่ต้อง Scroll
+                if (el.scrollHeight <= el.clientHeight + 5) return;
+                
+                let scrollPos = 0;
+                let direction = 1; // 1 = ลง, -1 = ขึ้น
+                let isPaused = false;
+                const scrollStep = 1; // ความเร็ว
+                
+                scrollIntervals[containerId] = setInterval(() => {
+                    if(isPaused) return;
+                    
+                    scrollPos += direction * scrollStep;
+                    el.scrollTop = scrollPos;
+                    
+                    // ถึงขอบล่าง
+                    if (scrollPos >= (el.scrollHeight - el.clientHeight)) {
+                        isPaused = true;
+                        direction = -1;
+                        setTimeout(() => { isPaused = false; }, 3000); // พัก 3 วิ
+                    } 
+                    // ถึงขอบบน
+                    else if (scrollPos <= 0) {
+                        isPaused = true;
+                        direction = 1;
+                        setTimeout(() => { isPaused = false; }, 3000); // พัก 3 วิ
+                    }
+                }, 40); // ความลื่นไหล (40ms = ~25fps)
+            }, 500);
         }
 
         function showLoading(isLoading) {
             const ind = document.getElementById('statusIndicator');
             const txt = document.getElementById('lastUpdateText');
             if (isLoading) {
-                ind.classList.replace('bg-emerald-500/20', 'bg-indigo-500/50');
-                ind.classList.replace('border-emerald-500/30', 'border-indigo-400/30');
-                ind.querySelector('div').className = 'w-2.5 h-2.5 bg-indigo-200 rounded-full animate-pulse';
-                txt.innerText = 'กำลังโหลด CSV...';
-                txt.className = 'text-white';
+                ind.classList.replace('bg-indigo-600/50', 'bg-slate-600/50');
+                ind.classList.replace('border-indigo-500/50', 'border-slate-500/50');
+                ind.querySelector('div').className = 'w-3 h-3 bg-yellow-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(250,204,21,0.8)]';
+                txt.innerText = 'กำลัง Sync...';
             } else {
-                ind.classList.replace('bg-indigo-500/50', 'bg-emerald-500/20');
-                ind.classList.replace('border-indigo-400/30', 'border-emerald-500/30');
-                ind.querySelector('div').className = 'w-2.5 h-2.5 bg-emerald-500 rounded-full';
+                ind.classList.replace('bg-slate-600/50', 'bg-indigo-600/50');
+                ind.classList.replace('border-slate-500/50', 'border-indigo-500/50');
+                ind.querySelector('div').className = 'w-3 h-3 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.8)]';
                 const d = new Date();
-                txt.innerText = `อัปเดตล่าสุด: ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
-                txt.className = 'text-emerald-800 font-bold';
+                txt.innerText = `อัปเดต: ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
             }
         }
 
@@ -601,13 +640,8 @@
             }, 1000);
         }
 
-        function forceRefresh() {
-            clearInterval(countdownTimer);
-            fetchData();
-        }
-
         function openSettings() {
-            document.getElementById('gsURL').value = currentUrl;
+            document.getElementById('csvURL').value = currentUrl;
             document.getElementById('refreshRate').value = currentRefreshRate;
             document.getElementById('pendingKeyword').value = pendingKeyword;
             document.getElementById('settingsModal').classList.remove('hidden');
@@ -618,16 +652,16 @@
         }
 
         function saveSettings() {
-            const urlInput = document.getElementById('gsURL').value.trim();
+            const urlInput = document.getElementById('csvURL').value.trim();
             const urlToSave = cleanURL(urlInput);
 
             if (urlToSave) {
                 currentUrl = urlToSave;
-                localStorage.setItem('packing_csv_url', currentUrl);
+                localStorage.setItem('packing_tv_csv_url', currentUrl);
             }
             
             let rate = parseInt(document.getElementById('refreshRate').value);
-            if(rate >= 5) { 
+            if(rate >= 3) { // ขั้นต่ำ 3 วินาที ป้องกันเซิร์ฟเวอร์ค้าง
                 currentRefreshRate = rate;
                 localStorage.setItem('packing_refresh_rate', currentRefreshRate);
             }
@@ -636,13 +670,21 @@
             localStorage.setItem('packing_pending_keyword', pendingKeyword);
             
             closeSettings();
-            forceRefresh();
+            
+            // รีเซ็ตทั้งหมดแล้วโหลดใหม่
+            clearInterval(countdownTimer);
+            for(let key in scrollIntervals) clearInterval(scrollIntervals[key]);
+            fetchData();
         }
 
-        // Boot App
+        // Boot
         window.onload = () => {
             initGauges();
-            fetchData();
+            if(!currentUrl) {
+                openSettings();
+            } else {
+                fetchData();
+            }
         };
     </script>
 </body>
