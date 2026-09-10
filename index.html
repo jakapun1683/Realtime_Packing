@@ -18,7 +18,7 @@
         /* สไตล์สำหรับ Gauge Chart */
         .gauge-container { position: relative; width: 100%; aspect-ratio: 1.8/1; display: flex; justify-content: center; align-items: flex-end; }
         .gauge-overlay { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2%; }
-        .gauge-percent { font-size: 2.2rem; font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
+        .gauge-percent { font-size: 2.2rem; font-weight: 600; line-height: 1; letter-spacing: -0.02em; }
         @media (min-width: 1536px) { .gauge-percent { font-size: 3rem; } }
         
         /* อนิเมชั่นแถบความคืบหน้า */
@@ -57,28 +57,28 @@
             <div class="flex-1 bg-white rounded-2xl shadow-md border-l-8 border-blue-500 p-4 2xl:p-6 flex flex-col justify-center relative overflow-hidden group">
                 <i class="fas fa-box-open absolute -right-4 -bottom-4 text-7xl text-blue-50 opacity-50 transform group-hover:scale-110 transition-transform"></i>
                 <p class="text-slate-500 text-lg 2xl:text-xl font-bold mb-1 z-10">ออเดอร์ทั้งหมด</p>
-                <h3 class="text-6xl 2xl:text-7xl font-black text-slate-800 tracking-tighter z-10" id="totalOrders">0</h3>
+                <h3 class="text-7xl 2xl:text-8xl font-medium text-slate-800 tracking-tight z-10" id="totalOrders">0</h3>
             </div>
             
             <!-- แพ็คสำเร็จ -->
             <div class="flex-1 bg-white rounded-2xl shadow-md border-l-8 border-emerald-500 p-4 2xl:p-6 flex flex-col justify-center relative overflow-hidden group">
                 <i class="fas fa-check-circle absolute -right-4 -bottom-4 text-7xl text-emerald-50 opacity-50 transform group-hover:scale-110 transition-transform"></i>
                 <p class="text-slate-500 text-lg 2xl:text-xl font-bold mb-1 z-10">แพ็คสำเร็จแล้ว</p>
-                <h3 class="text-6xl 2xl:text-7xl font-black text-emerald-600 tracking-tighter z-10" id="totalPacked">0</h3>
+                <h3 class="text-7xl 2xl:text-8xl font-medium text-emerald-600 tracking-tight z-10" id="totalPacked">0</h3>
             </div>
             
             <!-- รอแพ็ค -->
             <div class="flex-1 bg-white rounded-2xl shadow-md border-l-8 border-rose-500 p-4 2xl:p-6 flex flex-col justify-center relative overflow-hidden group">
                 <i class="fas fa-clock absolute -right-4 -bottom-4 text-7xl text-rose-50 opacity-50 transform group-hover:scale-110 transition-transform"></i>
                 <p class="text-slate-500 text-lg 2xl:text-xl font-bold mb-1 z-10">รอแพ็ค (คงเหลือ)</p>
-                <h3 class="text-6xl 2xl:text-7xl font-black text-rose-600 tracking-tighter z-10" id="totalRemaining">0</h3>
+                <h3 class="text-7xl 2xl:text-8xl font-medium text-rose-600 tracking-tight z-10" id="totalRemaining">0</h3>
             </div>
             
             <!-- ความคืบหน้า -->
             <div class="flex-1 bg-slate-800 rounded-2xl shadow-lg border border-slate-700 p-4 2xl:p-6 flex flex-col justify-center relative overflow-hidden">
                 <div class="flex justify-between items-end mb-3">
                     <p class="text-slate-300 text-lg 2xl:text-xl font-bold">ความคืบหน้า</p>
-                    <h3 class="text-4xl 2xl:text-5xl font-black text-white leading-none tracking-tighter" id="progressPercentText">0%</h3>
+                    <h3 class="text-5xl 2xl:text-6xl font-medium text-white leading-none tracking-tight" id="progressPercentText">0%</h3>
                 </div>
                 <div class="w-full bg-slate-900 rounded-full h-4 2xl:h-5 shadow-inner p-1">
                     <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-1000 progress-bar-animated shadow-[0_0_10px_rgba(99,102,241,0.5)]" style="width: 0%"></div>
@@ -564,11 +564,11 @@
                 item.className = 'flex flex-col bg-slate-50 p-3 2xl:p-4 rounded-xl border border-slate-100';
                 item.innerHTML = `
                     <div class="flex justify-between items-end mb-2">
-                        <span class="font-bold text-slate-700 text-lg 2xl:text-xl truncate max-w-[65%]" title="${c}">${c}</span>
-                        <div class="text-right leading-none">
-                            <span class="font-black ${textColor} text-2xl 2xl:text-3xl">${d.packed.toLocaleString()}</span>
-                            <span class="text-base 2xl:text-lg text-slate-400 font-bold ml-1">/ ${total.toLocaleString()}</span>
-                            <span class="ml-2 font-bold bg-white px-2 py-0.5 rounded text-slate-600 text-sm border shadow-sm">${percent}%</span>
+                        <span class="font-medium text-slate-700 text-base 2xl:text-lg truncate max-w-[65%]" title="${c}">${c}</span>
+                        <div class="text-right leading-none shrink-0">
+                            <span class="font-bold ${textColor} text-xl 2xl:text-2xl">${d.packed.toLocaleString()}</span>
+                            <span class="text-sm 2xl:text-base text-slate-400 font-medium ml-1">/ ${total.toLocaleString()}</span>
+                            <span class="ml-2 font-medium bg-white px-2 py-0.5 rounded text-slate-600 text-xs border shadow-sm">${percent}%</span>
                         </div>
                     </div>
                     <div class="w-full bg-slate-200 h-2 2xl:h-2.5 rounded-full overflow-hidden">
@@ -604,13 +604,13 @@
                 const itemDiv = document.createElement('div');
                 itemDiv.className = `flex items-center justify-between p-3 2xl:p-4 rounded-xl transition-colors border border-transparent ${rowStyle}`;
                 itemDiv.innerHTML = `
-                    <div class="flex items-center gap-4 w-[75%]">
-                        <div class="w-10 h-10 2xl:w-12 2xl:h-12 rounded-full flex items-center justify-center text-lg 2xl:text-xl shrink-0 ${rankStyle}">
+                    <div class="flex items-center gap-3 w-[75%]">
+                        <div class="w-8 h-8 2xl:w-10 2xl:h-10 rounded-full flex items-center justify-center text-base 2xl:text-lg shrink-0 ${rankStyle}">
                             ${rank}
                         </div>
-                        <span class="font-bold text-slate-700 text-xl 2xl:text-2xl truncate">${item[0]}</span>
+                        <span class="font-medium text-slate-700 text-base 2xl:text-lg truncate" title="${item[0]}">${item[0]}</span>
                     </div>
-                    <span class="font-black text-indigo-600 text-3xl 2xl:text-4xl tracking-tighter">${item[1].toLocaleString()}</span>
+                    <span class="font-bold text-indigo-600 text-2xl 2xl:text-3xl tracking-tighter shrink-0">${item[1].toLocaleString()}</span>
                 `;
                 container.appendChild(itemDiv);
             });
@@ -653,7 +653,7 @@
                         datalabels: {
                             display: true,
                             color: '#4338ca',
-                            font: { family: 'Kanit', weight: '900', size: window.innerWidth > 1536 ? 20 : 16 },
+                            font: { family: 'Kanit', weight: '600', size: window.innerWidth > 1536 ? 20 : 16 },
                             align: 'top',
                             offset: 10,
                             formatter: (value) => value > 0 ? value : ''
