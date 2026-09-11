@@ -274,16 +274,17 @@
         let peakChartInst = null;
         let scrollIntervals = {};
 
-        let lastValidTotal = 0;
-        let zeroCount = 0;
+        // ตัวแปรกันชน ป้องกันจอกระพริบเป็น 0
+        let lastValidTotal = parseInt(store.get('pk_last_total')) || 0;
+        let zeroCount = parseInt(store.get('pk_zero_count')) || 0;
 
-        /* บังคับสัดส่วนกราฟจาก Chart.js ป้องกันบั๊กบนทีวี */
+        // การตั้งค่า Gauge Chart ให้เหมาะกับ TV
         const gaugeOptions = {
             type: 'doughnut',
             options: {
                 responsive: true,
                 maintainAspectRatio: true, 
-                aspectRatio: 1.85, /* สัดส่วนที่ใกล้เคียงครึ่งวงกลม ตัดขอบว่างบนล่างออก */
+                aspectRatio: 1.85,
                 circumference: 180,
                 rotation: -90,
                 cutout: '88%',
@@ -382,9 +383,12 @@
             return loadCsv(src.url);
         }
 
+        // ================= ตัวดึงข้อมูล (ไล่ทีละ source จนกว่าจะได้) =================
         async function fetchData() {
             showLoading(true);
             const sources = getSources();
+            
+            // ให้เริ่มดึงที่อันดับแรกเสมอ (Sheet gviz ที่เร็วที่สุด) เพื่อป้องกันการค้างอยู่กับลิงก์สำรองที่ช้า
             const order = manualUrl ? sources.slice(activeIdx).concat(sources.slice(0, activeIdx)) : sources;
             const problems = [];
 
@@ -393,39 +397,47 @@
                 try {
                     const data = await loadFrom(src);
                     
+                    // 1. ตรวจสอบโครงสร้างพื้นฐาน
                     let isStructValid = false;
                     let tempTotal = 0;
                     
-                    if (data && data.rows && Array.isArray(data.rows) && data.rows.length > 0) {
-                        isStructValid = Object.keys(data.rows[0]).some(k => k.trim() === 'Station');
-                        if (isStructValid) {
-                            tempTotal = data.rows.filter(r => {
-                                let val = getCol(r, 'Station');
-                                return val && val.toString().trim() !== '';
-                            }).length;
+                    if (data && data.rows && Array.isArray(data.rows)) {
+                        if (data.rows.length > 0) {
+                            isStructValid = Object.keys(data.rows[0]).some(k => k.trim().toLowerCase() === 'station');
+                            if (isStructValid) {
+                                tempTotal = data.rows.filter(r => {
+                                    let val = getCol(r, 'Station');
+                                    return val && val.toString().trim() !== '';
+                                }).length;
+                            }
+                        } else {
+                            // กรณีชีตว่างเปล่า (แถวเป็น 0)
+                            isStructValid = true;
+                            tempTotal = 0;
                         }
                     } else if (data && typeof data.total === 'number' && data.platforms) {
                         isStructValid = true;
                         tempTotal = data.total;
                     }
 
-                    if (!isStructValid) throw new Error('โครงสร้างไม่ถูกต้อง/ชีตไม่มีข้อมูล');
+                    if (!isStructValid) throw new Error('โครงสร้างชีตผิด/หาคอลัมน์ Station ไม่เจอ');
 
+                    // 2. ระบบป้องกันข้อมูล 0 กะทันหัน (กันกรณีสลับไปลิงก์สำรองที่ไม่มีข้อมูล)
                     if (tempTotal === 0 && lastValidTotal > 0) {
                         zeroCount++;
-                        if (zeroCount <= 3) {
-                            console.warn(`ป้องกันจอเป็น 0 (ครั้งที่ ${zeroCount}/3) - รอ Sheet ประมวลผล`);
-                            activeIdx = sources.indexOf(src);
-                            document.getElementById('errorAlert').classList.add('hidden');
-                            showLoading(false, "รอชีตคำนวณสูตร...");
-                            startCountdown();
-                            return;
+                        store.set('pk_zero_count', zeroCount.toString());
+                        if (zeroCount <= 8) { // ป้องกัน 8 รอบ (ประมาณ 3 นาที)
+                            throw new Error(`ข้อมูลเป็น 0 ผิดปกติ (กันจอกระพริบครั้งที่ ${zeroCount}/8)`);
                         }
                     }
 
+                    // ข้อมูลผ่านเกณฑ์สมบูรณ์ นำไปใช้งานได้
                     lastValidTotal = tempTotal;
+                    store.set('pk_last_total', lastValidTotal.toString());
                     zeroCount = 0;
+                    store.set('pk_zero_count', '0');
 
+                    // 3. ส่งข้อมูลไปอัปเดตหน้าจอ
                     if (data.rows) processRows(data.rows);
                     else renderSummary(data);
 
@@ -442,11 +454,12 @@
                 }
             }
 
-            showError('ดึงข้อมูลไม่สำเร็จ (' + problems.join(', ') + ') — เช็คอินเทอร์เน็ตของทีวี หรือกดเฟืองเพื่อตั้งลิงก์เอง');
+            showError('ดึงข้อมูลไม่สำเร็จ (' + problems.join(', ') + ') — ระบบกำลังพยายามใหม่...');
             showLoading(false);
             startCountdown();
         }
 
+        // ================= เรนเดอร์จาก JSON ที่สรุปมาแล้ว =================
         function renderSummary(s) {
             updateOverallStats(s.total, s.packed);
             updateGauges(s.platforms);
@@ -535,7 +548,7 @@
             document.getElementById('totalRemaining').innerText = remaining.toLocaleString();
             
             let percentNum = total > 0 ? (packed / total) * 100 : 0;
-            let percentStr = percentNum >= 100 ? '100' : (percentNum === 0 ? '0' : percentNum.toFixed(2));
+            let percentStr = (percentNum === 100 || percentNum === 0) ? percentNum.toFixed(0) : percentNum.toFixed(2);
             document.getElementById('progressPercentText').innerText = percentStr + '%';
             document.getElementById('progressBar').style.width = percentNum + '%';
         }
@@ -547,7 +560,7 @@
                 dataObj = dataObj || blank;
                 let t = dataObj.p + dataObj.r;
                 let pctNum = t > 0 ? (dataObj.p / t) * 100 : 0;
-                let pctStr = pctNum >= 100 ? '100' : (pctNum === 0 ? '0' : pctNum.toFixed(2));
+                let pctStr = (pctNum === 100 || pctNum === 0) ? pctNum.toFixed(0) : pctNum.toFixed(2);
                 
                 document.getElementById(`txt${idBase}Pct`).innerText = pctStr + '%';
                 document.getElementById(`txt${idBase}Val`).innerText = `${dataObj.p.toLocaleString()} / ${t.toLocaleString()}`;
@@ -577,7 +590,7 @@
                 let d = couriers[c];
                 let total = d.packed + d.remaining;
                 let percentNum = total > 0 ? (d.packed / total) * 100 : 0;
-                let percentStr = percentNum >= 100 ? '100' : (percentNum === 0 ? '0' : percentNum.toFixed(2));
+                let percentStr = (percentNum === 100 || percentNum === 0) ? percentNum.toFixed(0) : percentNum.toFixed(2);
                 
                 const textColor = percentNum >= 100 ? 'text-emerald-600' : 'text-orange-600';
                 const barColor = percentNum >= 100 ? 'bg-emerald-500' : 'bg-orange-500';
