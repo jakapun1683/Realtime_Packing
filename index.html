@@ -275,6 +275,11 @@
         let peakChartInst = null;
         let scrollIntervals = {};
 
+        // ตัวแปรกันชน ป้องกันจอกระพริบเป็น 0
+        let lastValidTotal = 0;
+        let zeroCount = 0;
+
+        // การตั้งค่า Gauge Chart ให้เหมาะกับ TV
         const gaugeOptions = {
             type: 'doughnut',
             options: {
@@ -364,12 +369,10 @@
             });
         }
 
-        function isUsable(data) {
-            if (!data || data.ok === false) return false;
-            if (Array.isArray(data.rows)) {
-                return data.rows.length > 0 && Object.prototype.hasOwnProperty.call(data.rows[0], 'Station');
-            }
-            return typeof data.total === 'number' && !!data.platforms;
+        // อ่านคีย์แบบไม่สนช่องว่าง (กันการเผลอเว้นวรรคในหัวคอลัมน์ Sheets)
+        function getCol(row, colName) {
+            let key = Object.keys(row).find(k => k.trim().toLowerCase() === colName.toLowerCase());
+            return key ? row[key] : '';
         }
 
         function loadFrom(src) {
@@ -378,25 +381,65 @@
             return loadCsv(src.url);
         }
 
+        // ================= ตัวดึงข้อมูล (ไล่ทีละ source จนกว่าจะได้) =================
         async function fetchData() {
             showLoading(true);
             const sources = getSources();
-            const order = sources.slice(activeIdx).concat(sources.slice(0, activeIdx));
+            
+            // ให้เริ่มดึงที่อันดับแรกเสมอ (Sheet gviz ที่เร็วที่สุด) เพื่อป้องกันการค้างอยู่กับลิงก์สำรองที่ช้า
+            const order = manualUrl ? sources.slice(activeIdx).concat(sources.slice(0, activeIdx)) : sources;
             const problems = [];
 
             for (const src of order) {
                 if (!src.url || src.url.indexOf('http') !== 0) continue;
                 try {
                     const data = await loadFrom(src);
-                    if (!isUsable(data)) throw new Error('ข้อมูลไม่ตรงรูปแบบที่ต้องการ');
+                    
+                    // 1. ตรวจสอบโครงสร้างพื้นฐาน
+                    let isStructValid = false;
+                    let tempTotal = 0;
+                    
+                    if (data && data.rows && Array.isArray(data.rows) && data.rows.length > 0) {
+                        isStructValid = Object.keys(data.rows[0]).some(k => k.trim() === 'Station');
+                        if (isStructValid) {
+                            tempTotal = data.rows.filter(r => {
+                                let val = getCol(r, 'Station');
+                                return val && val.toString().trim() !== '';
+                            }).length;
+                        }
+                    } else if (data && typeof data.total === 'number' && data.platforms) {
+                        isStructValid = true;
+                        tempTotal = data.total;
+                    }
 
+                    if (!isStructValid) throw new Error('โครงสร้างไม่ถูกต้อง/ชีตไม่มีข้อมูล');
+
+                    // 2. ระบบป้องกันข้อมูล 0 กะทันหัน (Sheet อาการโหลดสูตรไม่เสร็จ)
+                    if (tempTotal === 0 && lastValidTotal > 0) {
+                        zeroCount++;
+                        if (zeroCount <= 3) {
+                            console.warn(`ป้องกันจอเป็น 0 (ครั้งที่ ${zeroCount}/3) - รอ Sheet ประมวลผล`);
+                            // ทำเนียนว่าสำเร็จแล้ว แต่ข้ามการอัปเดตหน้าจอไปก่อน
+                            activeIdx = sources.indexOf(src);
+                            document.getElementById('errorAlert').classList.add('hidden');
+                            showLoading(false, "รอชีตคำนวณสูตร...");
+                            startCountdown();
+                            return;
+                        }
+                    }
+
+                    // ข้อมูลผ่านเกณฑ์สมบูรณ์ นำไปใช้งานได้
+                    lastValidTotal = tempTotal;
+                    zeroCount = 0;
+
+                    // 3. ส่งข้อมูลไปอัปเดตหน้าจอ
                     if (data.rows) processRows(data.rows);
                     else renderSummary(data);
 
-                    activeIdx = sources.indexOf(src);
+                    activeIdx = manualUrl ? sources.indexOf(src) : 0;
                     document.getElementById('errorAlert').classList.add('hidden');
                     document.getElementById('sourceModeText').innerText =
-                        (src.live ? 'เรียลไทม์ · ' : 'สำรอง (ช้าราว 5 นาที) · ') + src.name;
+                        (src.live ? 'เรียลไทม์ · ' : 'สำรอง · ') + src.name;
                     showLoading(false, data.updatedAt);
                     startCountdown();
                     return;
@@ -406,11 +449,12 @@
                 }
             }
 
-            showError('ดึงข้อมูลไม่สำเร็จทุกช่องทาง (' + problems.join(', ') + ') — เช็คอินเทอร์เน็ต หรือกดเฟืองตั้งลิงก์ใหม่');
+            showError('ดึงข้อมูลไม่สำเร็จ (' + problems.join(', ') + ') — เช็คอินเทอร์เน็ตของทีวี หรือกดเฟืองเพื่อตั้งลิงก์เอง');
             showLoading(false);
             startCountdown();
         }
 
+        // ================= เรนเดอร์จาก JSON ที่สรุปมาแล้ว =================
         function renderSummary(s) {
             updateOverallStats(s.total, s.packed);
             updateGauges(s.platforms);
@@ -428,6 +472,7 @@
             updatePeakTimeChart(peak);
         }
 
+        // ================= เรนเดอร์จากข้อมูลดิบ (CSV / mode=rows) =================
         function processRows(data) {
             try {
                 let total = 0, packed = 0;
@@ -440,14 +485,15 @@
                 let peakTimes = {};
 
                 data.forEach(row => {
-                    let statusStr = (row['Station'] || '').toString().trim();
+                    let statusStr = (getCol(row, 'Station') || '').toString().trim();
                     if (statusStr === '') return;
 
                     total++;
                     const isPacked = statusStr !== pendingKeyword;
                     if (isPacked) packed++;
 
-                    let rawP = (row['Source'] || '').toString().toLowerCase();
+                    // Platform (คอลัมน์ Source)
+                    let rawP = (getCol(row, 'Source') || '').toString().toLowerCase();
                     let group = 'WalkIN';
                     if (rawP.includes('shopee')) group = 'Shopee';
                     else if (rawP.includes('tiktok')) group = 'Tiktok';
@@ -456,18 +502,22 @@
                     if (isPacked) platforms[group].p++;
                     else platforms[group].r++;
 
-                    let cName = (row['Delivery By'] || '').toString().trim() || 'ไม่ระบุ';
+                    // ขนส่ง (คอลัมน์ Delivery By)
+                    let cName = (getCol(row, 'Delivery By') || '').toString().trim() || 'ไม่ระบุ';
                     if (!couriers[cName]) couriers[cName] = { packed: 0, remaining: 0 };
                     if (isPacked) couriers[cName].packed++;
                     else couriers[cName].remaining++;
 
+                    // คนแพ็ค (คอลัมน์ Station)
                     if (isPacked) {
-                        if (!packers[statusStr]) packers[statusStr] = 0;
-                        packers[statusStr]++;
+                        let shortName = statusStr.replace(/packing/i, '').trim();
+                        if (!packers[shortName]) packers[shortName] = 0;
+                        packers[shortName]++;
                     }
 
+                    // Peak Time (คอลัมน์ Time)
                     if (isPacked) {
-                        let timeStr = (row['Time'] || '').toString().trim();
+                        let timeStr = (getCol(row, 'Time') || '').toString().trim();
                         if (timeStr) {
                             let hour = timeStr.split(':')[0];
                             if (!isNaN(hour) && hour !== '') {
