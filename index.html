@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <!-- Main Content Grid (3 Columns optimized for 16:9 TV) -->
+    <!-- Main Content Grid -->
     <div class="flex-1 flex gap-3 2xl:gap-5 min-h-0">
         
         <!-- ================= ซ้าย: ตัวเลขสรุปผล (20%) ================= -->
@@ -83,65 +83,65 @@
         <!-- ================= กลาง: Platform & Peak Time (50%) ================= -->
         <div class="w-1/2 flex flex-col gap-3 2xl:gap-5 h-full shrink-0">
             <!-- Platform Gauges -->
-            <!-- ปลด flex-[1.15] ออกเพื่อให้กล่องสูงพอดีเนื้อหา และเว้นที่ให้กราฟข้างล่างขยายตัว -->
-            <div class="bg-white rounded-2xl p-3 2xl:p-5 shadow-md flex flex-col shrink-0 border border-slate-200/60">
-                <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-3 text-xl shrink-0">
+            <div class="bg-white rounded-2xl p-3 2xl:p-4 shadow-md flex flex-col flex-[0.75] 2xl:flex-[0.8] border border-slate-200/60 min-h-0">
+                <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 text-xl shrink-0">
                     <i class="fas fa-layer-group text-indigo-500"></i> สัดส่วนออเดอร์แยกตาม Platform
                 </h3>
-                <div class="grid grid-cols-4 gap-2 2xl:gap-4 flex-1 items-end min-h-0">
+                <div class="grid grid-cols-4 gap-2 2xl:gap-4 flex-1 items-center min-h-0">
                     
                     <!-- Shopee -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
-                        <div class="w-full flex justify-center items-end flex-1 min-h-0 pb-1 2xl:pb-2">
+                    <div class="flex flex-col items-center justify-center bg-slate-50 rounded-xl p-3 border border-slate-100 h-full hover:shadow-md transition-shadow gap-1 2xl:gap-2">
+                        <div class="w-full px-2 2xl:px-4">
                             <canvas id="gaugeShopee"></canvas>
                         </div>
-                        <div class="text-center w-full shrink-0">
-                            <span id="txtShopeePct" class="text-orange-500 font-medium tracking-tight leading-none block mb-2" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
-                            <p class="font-medium text-slate-800 text-4xl 2xl:text-5xl tracking-wide mb-1 2xl:mb-2 leading-none truncate">SHOPEE</p>
-                            <div class="bg-orange-100 text-orange-800 font-medium text-3xl 2xl:text-4xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtShopeeVal">0 / 0</div>
+                        <span id="txtShopeePct" class="text-orange-500 font-medium tracking-tighter leading-none" style="font-size: clamp(2.5rem, 4vw, 4.5rem);">0%</span>
+                        <div class="text-center w-full mt-1 2xl:mt-2">
+                            <p class="font-bold text-slate-800 tracking-tighter mb-1.5 leading-none" style="font-size: clamp(1.6rem, 2.5vw, 2.5rem);">SHOPEE</p>
+                            <div class="bg-orange-100 text-orange-800 font-bold px-1 py-1.5 2xl:py-2 rounded-lg w-full tracking-tighter leading-none" style="font-size: clamp(1.4rem, 2.2vw, 2.2rem);" id="txtShopeeVal">0 / 0</div>
                         </div>
                     </div>
 
                     <!-- TikTok -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
-                        <div class="w-full flex justify-center items-end flex-1 min-h-0 pb-1 2xl:pb-2">
+                    <div class="flex flex-col items-center justify-center bg-slate-50 rounded-xl p-3 border border-slate-100 h-full hover:shadow-md transition-shadow gap-1 2xl:gap-2">
+                        <div class="w-full px-2 2xl:px-4">
                             <canvas id="gaugeTiktok"></canvas>
                         </div>
-                        <div class="text-center w-full shrink-0">
-                            <span id="txtTiktokPct" class="text-slate-800 font-medium tracking-tight leading-none block mb-2" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
-                            <p class="font-medium text-slate-800 text-4xl 2xl:text-5xl tracking-wide mb-1 2xl:mb-2 leading-none truncate">TIKTOK</p>
-                            <div class="bg-slate-200 text-slate-800 font-medium text-3xl 2xl:text-4xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtTiktokVal">0 / 0</div>
+                        <span id="txtTiktokPct" class="text-slate-800 font-medium tracking-tighter leading-none" style="font-size: clamp(2.5rem, 4vw, 4.5rem);">0%</span>
+                        <div class="text-center w-full mt-1 2xl:mt-2">
+                            <p class="font-bold text-slate-800 tracking-tighter mb-1.5 leading-none" style="font-size: clamp(1.6rem, 2.5vw, 2.5rem);">TIKTOK</p>
+                            <div class="bg-slate-200 text-slate-800 font-bold px-1 py-1.5 2xl:py-2 rounded-lg w-full tracking-tighter leading-none" style="font-size: clamp(1.4rem, 2.2vw, 2.2rem);" id="txtTiktokVal">0 / 0</div>
                         </div>
                     </div>
 
                     <!-- Lazada -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
-                        <div class="w-full flex justify-center items-end flex-1 min-h-0 pb-1 2xl:pb-2">
+                    <div class="flex flex-col items-center justify-center bg-slate-50 rounded-xl p-3 border border-slate-100 h-full hover:shadow-md transition-shadow gap-1 2xl:gap-2">
+                        <div class="w-full px-2 2xl:px-4">
                             <canvas id="gaugeLazada"></canvas>
                         </div>
-                        <div class="text-center w-full shrink-0">
-                            <span id="txtLazadaPct" class="text-blue-600 font-medium tracking-tight leading-none block mb-2" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
-                            <p class="font-medium text-slate-800 text-4xl 2xl:text-5xl tracking-wide mb-1 2xl:mb-2 leading-none truncate">LAZADA</p>
-                            <div class="bg-blue-100 text-blue-800 font-medium text-3xl 2xl:text-4xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtLazadaVal">0 / 0</div>
+                        <span id="txtLazadaPct" class="text-blue-600 font-medium tracking-tighter leading-none" style="font-size: clamp(2.5rem, 4vw, 4.5rem);">0%</span>
+                        <div class="text-center w-full mt-1 2xl:mt-2">
+                            <p class="font-bold text-slate-800 tracking-tighter mb-1.5 leading-none" style="font-size: clamp(1.6rem, 2.5vw, 2.5rem);">LAZADA</p>
+                            <div class="bg-blue-100 text-blue-800 font-bold px-1 py-1.5 2xl:py-2 rounded-lg w-full tracking-tighter leading-none" style="font-size: clamp(1.4rem, 2.2vw, 2.2rem);" id="txtLazadaVal">0 / 0</div>
                         </div>
                     </div>
 
                     <!-- WalkIN -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
-                        <div class="w-full flex justify-center items-end flex-1 min-h-0 pb-1 2xl:pb-2">
+                    <div class="flex flex-col items-center justify-center bg-slate-50 rounded-xl p-3 border border-slate-100 h-full hover:shadow-md transition-shadow gap-1 2xl:gap-2">
+                        <div class="w-full px-2 2xl:px-4">
                             <canvas id="gaugeWalkin"></canvas>
                         </div>
-                        <div class="text-center w-full shrink-0">
-                            <span id="txtWalkinPct" class="text-emerald-500 font-medium tracking-tight leading-none block mb-2" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
-                            <p class="font-medium text-slate-800 text-4xl 2xl:text-5xl tracking-wide mb-1 2xl:mb-2 leading-none truncate" style="letter-spacing: -1px;">WALK IN</p>
-                            <div class="bg-emerald-100 text-emerald-800 font-medium text-3xl 2xl:text-4xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtWalkinVal">0 / 0</div>
+                        <span id="txtWalkinPct" class="text-emerald-500 font-medium tracking-tighter leading-none" style="font-size: clamp(2.5rem, 4vw, 4.5rem);">0%</span>
+                        <div class="text-center w-full mt-1 2xl:mt-2">
+                            <p class="font-bold text-slate-800 tracking-tighter mb-1.5 leading-none" style="font-size: clamp(1.6rem, 2.5vw, 2.5rem);">WALK IN</p>
+                            <div class="bg-emerald-100 text-emerald-800 font-bold px-1 py-1.5 2xl:py-2 rounded-lg w-full tracking-tighter leading-none" style="font-size: clamp(1.4rem, 2.2vw, 2.2rem);" id="txtWalkinVal">0 / 0</div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
             <!-- Peak Time Chart -->
-            <div class="bg-white rounded-2xl p-4 2xl:p-6 shadow-md border border-slate-200/60 flex-1 flex flex-col min-h-0 relative">
+            <div class="bg-white rounded-2xl p-4 2xl:p-6 shadow-md border border-slate-200/60 flex-[1.25] 2xl:flex-[1.2] flex flex-col min-h-0 relative">
                 <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 text-xl shrink-0">
                     <i class="fas fa-chart-area text-indigo-500"></i> แนวโน้มการแพ็คออเดอร์ (Peak Time)
                 </h3>
@@ -196,8 +196,7 @@
                     <label class="block text-base font-bold text-slate-700 mb-1">ลิงก์ข้อมูล (ไม่ต้องกรอกก็ได้)</label>
                     <input type="text" id="csvURL" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-base rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" placeholder="เว้นว่าง = ไล่หาช่องทางที่ใช้ได้อัตโนมัติ">
                     <p class="text-sm text-slate-500 mt-2 font-medium leading-relaxed">
-                        <i class="fas fa-wand-magic-sparkles text-indigo-500"></i> ปกติเว้นว่างไว้ ระบบจะไล่ลอง Apps Script → gviz → CSV ที่เผยแพร่ ให้เอง<br>
-                        <i class="fas fa-link text-slate-400"></i> กรอกเมื่อต้องการล็อกช่องทางเดียว (Web app <code>/exec</code> หรือลิงก์ <code>output=csv</code>)
+                        <i class="fas fa-wand-magic-sparkles text-indigo-500"></i> ปกติเว้นว่างไว้ ระบบจะไล่ลองหาช่องทางที่เร็วที่สุดอัตโนมัติ<br>
                     </p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
@@ -269,11 +268,11 @@
         let peakChartInst = null;
         let scrollIntervals = {};
 
-        // ตัวแปรกันชน ป้องกันจอกระพริบเป็น 0
+        // ระบบกันหน้าจอกระพริบเป็น 0
         let lastValidTotal = parseInt(store.get('pk_last_total')) || 0;
         let zeroCount = parseInt(store.get('pk_zero_count')) || 0;
 
-        // การตั้งค่า Gauge Chart ให้เหมาะกับ TV
+        // การตั้งค่าวงแหวน
         const gaugeOptions = {
             type: 'doughnut',
             options: {
@@ -378,7 +377,6 @@
             return loadCsv(src.url);
         }
 
-        // ================= ตัวดึงข้อมูล (ไล่ทีละ source จนกว่าจะได้) =================
         async function fetchData() {
             showLoading(true);
             const sources = getSources();
@@ -412,9 +410,8 @@
                         tempTotal = data.total;
                     }
 
-                    if (!isStructValid) throw new Error('โครงสร้างชีตผิด/หาคอลัมน์ Station ไม่เจอ');
+                    if (!isStructValid) throw new Error('โครงสร้างชีตผิด');
 
-                    // 2. ระบบป้องกันข้อมูล 0 กะทันหัน
                     if (tempTotal === 0 && lastValidTotal > 0) {
                         zeroCount++;
                         store.set('pk_zero_count', zeroCount.toString());
@@ -444,7 +441,7 @@
                 }
             }
 
-            showError('ดึงข้อมูลไม่สำเร็จ (' + problems.join(', ') + ') — ระบบกำลังพยายามใหม่...');
+            showError('ดึงข้อมูลไม่สำเร็จ (' + problems.join(', ') + ')');
             showLoading(false);
             startCountdown();
         }
@@ -525,15 +522,14 @@
                 
             } catch (e) {
                 console.error('Processing Error:', e);
-                showError('รูปแบบข้อมูลไม่ตรงกัน — ตรวจสอบหัวคอลัมน์ในชีต');
+                showError('รูปแบบข้อมูลไม่ตรงกัน');
             }
         }
 
-        // ฟังก์ชันช่วยจัดการทศนิยม
         function formatPercent(packed, total) {
             if (total === 0) return '0%';
-            let pct = (packed / total) * 100;
-            return (pct === 100 || pct === 0) ? pct.toFixed(0) + '%' : pct.toFixed(2) + '%';
+            let pctNum = (packed / total) * 100;
+            return (pctNum === 100 || pctNum === 0) ? pctNum.toFixed(0) + '%' : pctNum.toFixed(2) + '%';
         }
 
         function updateOverallStats(total, packed) {
@@ -555,9 +551,7 @@
                 dataObj = dataObj || blank;
                 let t = dataObj.p + dataObj.r;
                 
-                let pctText = formatPercent(dataObj.p, t);
-                
-                document.getElementById(`txt${idBase}Pct`).innerText = pctText;
+                document.getElementById(`txt${idBase}Pct`).innerText = formatPercent(dataObj.p, t);
                 document.getElementById(`txt${idBase}Val`).innerText = `${dataObj.p.toLocaleString()} / ${t.toLocaleString()}`;
                 
                 chartInst.data.datasets[0].data = [dataObj.p, dataObj.r];
@@ -587,8 +581,8 @@
                 let pctRaw = total > 0 ? (d.packed / total) * 100 : 0;
                 let percentText = formatPercent(d.packed, total);
                 
-                const textColor = pctRaw === 100 ? 'text-emerald-600' : 'text-orange-600';
-                const barColor = pctRaw === 100 ? 'bg-emerald-500' : 'bg-orange-500';
+                const textColor = pctRaw >= 100 ? 'text-emerald-600' : 'text-orange-600';
+                const barColor = pctRaw >= 100 ? 'bg-emerald-500' : 'bg-orange-500';
 
                 const item = document.createElement('div');
                 item.className = 'flex flex-col bg-slate-50 p-2 2xl:p-3 rounded-xl border border-slate-100';
@@ -651,6 +645,11 @@
         }
 
         function updatePeakTimeChart(peakData) {
+            // บังคับให้มีเวลา 12:00 ในแกน X เสมอ แม้ช่วงนั้นจะไม่มีออเดอร์
+            if (peakData['12:00'] === undefined) {
+                peakData['12:00'] = 0;
+            }
+
             const sortedHours = Object.keys(peakData).sort();
             const dataValues = sortedHours.map(h => peakData[h]);
 
