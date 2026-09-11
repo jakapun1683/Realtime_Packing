@@ -17,9 +17,9 @@
         
         /* สไตล์สำหรับ Gauge Chart */
         .gauge-container { position: relative; width: 100%; aspect-ratio: 2/1; display: flex; justify-content: center; align-items: flex-end; }
-        .gauge-overlay { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2%; }
-        .gauge-percent { font-size: 1.35rem; font-weight: 700; line-height: 1; letter-spacing: 0; }
-        @media (min-width: 1536px) { .gauge-percent { font-size: 1.85rem; } }
+        .gauge-overlay { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 0; }
+        .gauge-percent { font-size: 1.45rem; font-weight: 700; line-height: 1; letter-spacing: -0.03em; }
+        @media (min-width: 1536px) { .gauge-percent { font-size: 1.95rem; } }
         
         /* อนิเมชั่นแถบความคืบหน้า */
         .progress-bar-animated { background-size: 1rem 1rem; background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); animation: progress-stripes 1s linear infinite; }
@@ -97,7 +97,7 @@
                 <div class="grid grid-cols-4 gap-2 2xl:gap-4 flex-1 items-center">
                     <!-- Shopee -->
                     <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
-                        <div class="gauge-container mb-2 w-full max-w-[180px]">
+                        <div class="gauge-container mb-2 w-full max-w-[200px] 2xl:max-w-[240px]">
                             <canvas id="gaugeShopee"></canvas>
                             <div class="gauge-overlay text-orange-500"><span id="txtShopeePct" class="gauge-percent">0%</span></div>
                         </div>
@@ -108,7 +108,7 @@
                     </div>
                     <!-- TikTok -->
                     <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
-                        <div class="gauge-container mb-2 w-full max-w-[180px]">
+                        <div class="gauge-container mb-2 w-full max-w-[200px] 2xl:max-w-[240px]">
                             <canvas id="gaugeTiktok"></canvas>
                             <div class="gauge-overlay text-black"><span id="txtTiktokPct" class="gauge-percent">0%</span></div>
                         </div>
@@ -119,7 +119,7 @@
                     </div>
                     <!-- Lazada -->
                     <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
-                        <div class="gauge-container mb-2 w-full max-w-[180px]">
+                        <div class="gauge-container mb-2 w-full max-w-[200px] 2xl:max-w-[240px]">
                             <canvas id="gaugeLazada"></canvas>
                             <div class="gauge-overlay text-blue-600"><span id="txtLazadaPct" class="gauge-percent">0%</span></div>
                         </div>
@@ -130,7 +130,7 @@
                     </div>
                     <!-- WalkIN -->
                     <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
-                        <div class="gauge-container mb-2 w-full max-w-[180px]">
+                        <div class="gauge-container mb-2 w-full max-w-[200px] 2xl:max-w-[240px]">
                             <canvas id="gaugeWalkin"></canvas>
                             <div class="gauge-overlay text-emerald-500"><span id="txtWalkinPct" class="gauge-percent">0%</span></div>
                         </div>
@@ -287,7 +287,7 @@
                 maintainAspectRatio: false,
                 circumference: 180,
                 rotation: -90,
-                cutout: '82%',
+                cutout: '88%',
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: false },
