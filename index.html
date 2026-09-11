@@ -17,11 +17,12 @@
         
         /* สไตล์สำหรับ Gauge Chart */
         .gauge-container { position: relative; width: 100%; aspect-ratio: 1.8/1; display: flex; justify-content: center; align-items: flex-end; }
-        .gauge-overlay { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2%; }
+        /* ขยับลงมาด้านล่างนิดนึง (-5%) เพื่อให้อยู่ตรงส่วนที่กว้างที่สุดของครึ่งวงกลม */
+        .gauge-overlay { position: absolute; bottom: -5%; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; justify-content: flex-end; }
         
-        /* ปรับฟอนต์ให้บาง (300) และขยายให้ใหญ่ขึ้นมาก */
-        .gauge-percent { font-size: 3.2rem; font-weight: 400; line-height: 0.95; letter-spacing: -0.02em; }
-        @media (min-width: 1536px) { .gauge-percent { font-size: 4.8rem; font-weight: 300; } }
+        /* ปรับขนาดให้พอดีไม่ล้น (จาก 3.2 เหลือ 2.4) และบีบตัวเลขให้ชิดกันนิดนึง */
+        .gauge-percent { font-size: 2.4rem; font-weight: 400; line-height: 1; letter-spacing: -0.05em; }
+        @media (min-width: 1536px) { .gauge-percent { font-size: 3.5rem; font-weight: 300; } }
         
         /* อนิเมชั่นแถบความคืบหน้า */
         .progress-bar-animated { background-size: 1rem 1rem; background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); animation: progress-stripes 1s linear infinite; }
@@ -104,9 +105,9 @@
                             <div class="gauge-overlay text-orange-500"><span id="txtShopeePct" class="gauge-percent">0.00%</span></div>
                         </div>
                         <div class="text-center w-full mt-2">
-                            <!-- ปรับเป็น font-normal และเพิ่มขนาด -->
-                            <p class="font-normal text-slate-800 text-3xl 2xl:text-5xl tracking-wide mb-1.5">SHOPEE</p>
-                            <div class="bg-orange-100 text-orange-800 font-normal text-2xl 2xl:text-4xl px-3 py-1.5 rounded-xl border border-orange-200/50 shadow-inner truncate w-full" id="txtShopeeVal">0 / 0</div>
+                            <!-- ลดขนาดตัวหนังสือด้านล่างให้สมดุลกับกราฟ -->
+                            <p class="font-normal text-slate-800 text-2xl 2xl:text-4xl tracking-wide mb-1.5">SHOPEE</p>
+                            <div class="bg-orange-100 text-orange-800 font-normal text-xl 2xl:text-3xl px-3 py-1.5 rounded-xl border border-orange-200/50 shadow-inner truncate w-full" id="txtShopeeVal">0 / 0</div>
                         </div>
                     </div>
                     <!-- TikTok -->
@@ -116,8 +117,8 @@
                             <div class="gauge-overlay text-slate-800"><span id="txtTiktokPct" class="gauge-percent">0.00%</span></div>
                         </div>
                         <div class="text-center w-full mt-2">
-                            <p class="font-normal text-slate-800 text-3xl 2xl:text-5xl tracking-wide mb-1.5">TIKTOK</p>
-                            <div class="bg-slate-200 text-slate-800 font-normal text-2xl 2xl:text-4xl px-3 py-1.5 rounded-xl border border-slate-300/50 shadow-inner truncate w-full" id="txtTiktokVal">0 / 0</div>
+                            <p class="font-normal text-slate-800 text-2xl 2xl:text-4xl tracking-wide mb-1.5">TIKTOK</p>
+                            <div class="bg-slate-200 text-slate-800 font-normal text-xl 2xl:text-3xl px-3 py-1.5 rounded-xl border border-slate-300/50 shadow-inner truncate w-full" id="txtTiktokVal">0 / 0</div>
                         </div>
                     </div>
                     <!-- Lazada -->
@@ -127,8 +128,8 @@
                             <div class="gauge-overlay text-blue-600"><span id="txtLazadaPct" class="gauge-percent">0.00%</span></div>
                         </div>
                         <div class="text-center w-full mt-2">
-                            <p class="font-normal text-slate-800 text-3xl 2xl:text-5xl tracking-wide mb-1.5">LAZADA</p>
-                            <div class="bg-blue-100 text-blue-800 font-normal text-2xl 2xl:text-4xl px-3 py-1.5 rounded-xl border border-blue-200/50 shadow-inner truncate w-full" id="txtLazadaVal">0 / 0</div>
+                            <p class="font-normal text-slate-800 text-2xl 2xl:text-4xl tracking-wide mb-1.5">LAZADA</p>
+                            <div class="bg-blue-100 text-blue-800 font-normal text-xl 2xl:text-3xl px-3 py-1.5 rounded-xl border border-blue-200/50 shadow-inner truncate w-full" id="txtLazadaVal">0 / 0</div>
                         </div>
                     </div>
                     <!-- WalkIN -->
@@ -138,8 +139,8 @@
                             <div class="gauge-overlay text-emerald-500"><span id="txtWalkinPct" class="gauge-percent">0.00%</span></div>
                         </div>
                         <div class="text-center w-full mt-2">
-                            <p class="font-normal text-slate-800 text-3xl 2xl:text-5xl tracking-wide mb-1.5">LINE/OTHER</p>
-                            <div class="bg-emerald-100 text-emerald-800 font-normal text-2xl 2xl:text-4xl px-3 py-1.5 rounded-xl border border-emerald-200/50 shadow-inner truncate w-full" id="txtWalkinVal">0 / 0</div>
+                            <p class="font-normal text-slate-800 text-2xl 2xl:text-4xl tracking-wide mb-1.5">LINE/OTHER</p>
+                            <div class="bg-emerald-100 text-emerald-800 font-normal text-xl 2xl:text-3xl px-3 py-1.5 rounded-xl border border-emerald-200/50 shadow-inner truncate w-full" id="txtWalkinVal">0 / 0</div>
                         </div>
                     </div>
                 </div>
@@ -289,7 +290,7 @@
                 maintainAspectRatio: false,
                 circumference: 180,
                 rotation: -90,
-                cutout: '88%', /* วงแหวนบางลง เพื่อเพิ่มพื้นที่ให้ตัวเลขใหญ่ๆ */
+                cutout: '90%', /* วงแหวนบางลงอีก เพื่อให้พื้นที่ตรงกลางกว้างสุดๆ ป้องกันเลขทะลุ */
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: false },
