@@ -72,7 +72,7 @@
             <div class="flex-1 bg-slate-800 rounded-2xl shadow-lg border border-slate-700 p-4 2xl:p-6 flex flex-col justify-center relative overflow-hidden">
                 <div class="flex justify-between items-end mb-3">
                     <p class="text-slate-300 text-lg 2xl:text-xl font-bold">ความคืบหน้า</p>
-                    <h3 class="text-4xl 2xl:text-5xl font-medium text-white leading-none" id="progressPercentText">0.00%</h3>
+                    <h3 class="text-5xl 2xl:text-6xl font-medium text-white leading-none" id="progressPercentText">0%</h3>
                 </div>
                 <div class="w-full bg-slate-900 rounded-full h-4 2xl:h-5 shadow-inner p-1">
                     <div id="progressBar" class="bg-gradient-to-r from-indigo-500 to-purple-500 h-full rounded-full transition-all duration-1000 progress-bar-animated shadow-[0_0_10px_rgba(99,102,241,0.5)]" style="width: 0%"></div>
@@ -83,62 +83,58 @@
         <!-- ================= กลาง: Platform & Peak Time (50%) ================= -->
         <div class="w-1/2 flex flex-col gap-3 2xl:gap-5 h-full shrink-0">
             <!-- Platform Gauges -->
-            <div class="bg-white rounded-2xl p-3 2xl:p-4 shadow-md flex flex-col shrink-0 border border-slate-200/60">
-                <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 text-xl px-1 shrink-0">
+            <!-- ปลด flex-[1.15] ออกเพื่อให้กล่องสูงพอดีเนื้อหา และเว้นที่ให้กราฟข้างล่างขยายตัว -->
+            <div class="bg-white rounded-2xl p-3 2xl:p-5 shadow-md flex flex-col shrink-0 border border-slate-200/60">
+                <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-3 text-xl shrink-0">
                     <i class="fas fa-layer-group text-indigo-500"></i> สัดส่วนออเดอร์แยกตาม Platform
                 </h3>
-                <div class="grid grid-cols-4 gap-2 2xl:gap-3 flex-1 items-stretch min-h-0">
+                <div class="grid grid-cols-4 gap-2 2xl:gap-4 flex-1 items-end min-h-0">
+                    
                     <!-- Shopee -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow justify-between">
-                        <!-- กราฟและเปอร์เซ็นต์ (ซ้อนกันเพื่อประหยัดพื้นที่แนวตั้ง) -->
-                        <div class="relative w-full flex justify-center pb-2">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
+                        <div class="w-full flex justify-center items-end flex-1 min-h-0 pb-1 2xl:pb-2">
                             <canvas id="gaugeShopee"></canvas>
-                            <div class="absolute bottom-0 left-0 right-0 flex justify-center translate-y-3">
-                                <span id="txtShopeePct" class="text-orange-500 font-normal tracking-tight leading-none" style="font-size: clamp(1.8rem, 3vw, 3.5rem);">0%</span>
-                            </div>
                         </div>
-                        <div class="text-center w-full mt-4 shrink-0">
-                            <p class="font-normal text-slate-800 text-base 2xl:text-xl tracking-wide mb-1 leading-none">SHOPEE</p>
-                            <div class="bg-orange-100 text-orange-800 font-normal text-sm 2xl:text-lg px-2 py-0.5 rounded truncate w-full" id="txtShopeeVal">0 / 0</div>
+                        <div class="text-center w-full shrink-0">
+                            <span id="txtShopeePct" class="text-orange-500 font-medium tracking-tight leading-none block mb-2" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
+                            <p class="font-medium text-slate-800 text-4xl 2xl:text-5xl tracking-wide mb-1 2xl:mb-2 leading-none truncate">SHOPEE</p>
+                            <div class="bg-orange-100 text-orange-800 font-medium text-3xl 2xl:text-4xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtShopeeVal">0 / 0</div>
                         </div>
                     </div>
+
                     <!-- TikTok -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow justify-between">
-                        <div class="relative w-full flex justify-center pb-2">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
+                        <div class="w-full flex justify-center items-end flex-1 min-h-0 pb-1 2xl:pb-2">
                             <canvas id="gaugeTiktok"></canvas>
-                            <div class="absolute bottom-0 left-0 right-0 flex justify-center translate-y-3">
-                                <span id="txtTiktokPct" class="text-slate-800 font-normal tracking-tight leading-none" style="font-size: clamp(1.8rem, 3vw, 3.5rem);">0%</span>
-                            </div>
                         </div>
-                        <div class="text-center w-full mt-4 shrink-0">
-                            <p class="font-normal text-slate-800 text-base 2xl:text-xl tracking-wide mb-1 leading-none">TIKTOK</p>
-                            <div class="bg-slate-200 text-slate-800 font-normal text-sm 2xl:text-lg px-2 py-0.5 rounded truncate w-full" id="txtTiktokVal">0 / 0</div>
+                        <div class="text-center w-full shrink-0">
+                            <span id="txtTiktokPct" class="text-slate-800 font-medium tracking-tight leading-none block mb-2" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
+                            <p class="font-medium text-slate-800 text-4xl 2xl:text-5xl tracking-wide mb-1 2xl:mb-2 leading-none truncate">TIKTOK</p>
+                            <div class="bg-slate-200 text-slate-800 font-medium text-3xl 2xl:text-4xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtTiktokVal">0 / 0</div>
                         </div>
                     </div>
+
                     <!-- Lazada -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow justify-between">
-                        <div class="relative w-full flex justify-center pb-2">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
+                        <div class="w-full flex justify-center items-end flex-1 min-h-0 pb-1 2xl:pb-2">
                             <canvas id="gaugeLazada"></canvas>
-                            <div class="absolute bottom-0 left-0 right-0 flex justify-center translate-y-3">
-                                <span id="txtLazadaPct" class="text-blue-600 font-normal tracking-tight leading-none" style="font-size: clamp(1.8rem, 3vw, 3.5rem);">0%</span>
-                            </div>
                         </div>
-                        <div class="text-center w-full mt-4 shrink-0">
-                            <p class="font-normal text-slate-800 text-base 2xl:text-xl tracking-wide mb-1 leading-none">LAZADA</p>
-                            <div class="bg-blue-100 text-blue-800 font-normal text-sm 2xl:text-lg px-2 py-0.5 rounded truncate w-full" id="txtLazadaVal">0 / 0</div>
+                        <div class="text-center w-full shrink-0">
+                            <span id="txtLazadaPct" class="text-blue-600 font-medium tracking-tight leading-none block mb-2" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
+                            <p class="font-medium text-slate-800 text-4xl 2xl:text-5xl tracking-wide mb-1 2xl:mb-2 leading-none truncate">LAZADA</p>
+                            <div class="bg-blue-100 text-blue-800 font-medium text-3xl 2xl:text-4xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtLazadaVal">0 / 0</div>
                         </div>
                     </div>
+
                     <!-- WalkIN -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow justify-between">
-                        <div class="relative w-full flex justify-center pb-2">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
+                        <div class="w-full flex justify-center items-end flex-1 min-h-0 pb-1 2xl:pb-2">
                             <canvas id="gaugeWalkin"></canvas>
-                            <div class="absolute bottom-0 left-0 right-0 flex justify-center translate-y-3">
-                                <span id="txtWalkinPct" class="text-emerald-500 font-normal tracking-tight leading-none" style="font-size: clamp(1.8rem, 3vw, 3.5rem);">0%</span>
-                            </div>
                         </div>
-                        <div class="text-center w-full mt-4 shrink-0">
-                            <p class="font-normal text-slate-800 text-base 2xl:text-xl tracking-wide mb-1 leading-none">LINE/OTHER</p>
-                            <div class="bg-emerald-100 text-emerald-800 font-normal text-sm 2xl:text-lg px-2 py-0.5 rounded truncate w-full" id="txtWalkinVal">0 / 0</div>
+                        <div class="text-center w-full shrink-0">
+                            <span id="txtWalkinPct" class="text-emerald-500 font-medium tracking-tight leading-none block mb-2" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
+                            <p class="font-medium text-slate-800 text-4xl 2xl:text-5xl tracking-wide mb-1 2xl:mb-2 leading-none truncate" style="letter-spacing: -1px;">WALK IN</p>
+                            <div class="bg-emerald-100 text-emerald-800 font-medium text-3xl 2xl:text-4xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtWalkinVal">0 / 0</div>
                         </div>
                     </div>
                 </div>
@@ -259,8 +255,7 @@
 
         function getSources() {
             if (!manualUrl) return SOURCES;
-            const type = /output=csv|gviz\/tq/i.test(manualUrl) ? 'csv'
-                       : (/\/exec/i.test(manualUrl) ? 'jsonp' : 'json');
+            const type = /output=csv|gviz\/tq/i.test(manualUrl) ? 'csv' : (/\/exec/i.test(manualUrl) ? 'jsonp' : 'json');
             const list = [{ name: 'ลิงก์ที่ตั้งเอง', type: type, url: manualUrl, live: type !== 'csv' || /gviz/i.test(manualUrl) }];
             if (type === 'jsonp') list.push({ name: 'ลิงก์ที่ตั้งเอง (fetch)', type: 'json', url: manualUrl, live: true });
             return list;
@@ -284,12 +279,12 @@
             options: {
                 responsive: true,
                 maintainAspectRatio: true, 
-                aspectRatio: 1.85,
+                aspectRatio: 2,
                 circumference: 180,
                 rotation: -90,
                 cutout: '88%',
                 layout: {
-                    padding: { bottom: 25, left: 5, right: 5, top: 10 }
+                    padding: { bottom: 0, left: 5, right: 5, top: 10 }
                 },
                 plugins: {
                     legend: { display: false },
@@ -388,7 +383,6 @@
             showLoading(true);
             const sources = getSources();
             
-            // ให้เริ่มดึงที่อันดับแรกเสมอ (Sheet gviz ที่เร็วที่สุด) เพื่อป้องกันการค้างอยู่กับลิงก์สำรองที่ช้า
             const order = manualUrl ? sources.slice(activeIdx).concat(sources.slice(0, activeIdx)) : sources;
             const problems = [];
 
@@ -397,7 +391,6 @@
                 try {
                     const data = await loadFrom(src);
                     
-                    // 1. ตรวจสอบโครงสร้างพื้นฐาน
                     let isStructValid = false;
                     let tempTotal = 0;
                     
@@ -411,7 +404,6 @@
                                 }).length;
                             }
                         } else {
-                            // กรณีชีตว่างเปล่า (แถวเป็น 0)
                             isStructValid = true;
                             tempTotal = 0;
                         }
@@ -422,22 +414,20 @@
 
                     if (!isStructValid) throw new Error('โครงสร้างชีตผิด/หาคอลัมน์ Station ไม่เจอ');
 
-                    // 2. ระบบป้องกันข้อมูล 0 กะทันหัน (กันกรณีสลับไปลิงก์สำรองที่ไม่มีข้อมูล)
+                    // 2. ระบบป้องกันข้อมูล 0 กะทันหัน
                     if (tempTotal === 0 && lastValidTotal > 0) {
                         zeroCount++;
                         store.set('pk_zero_count', zeroCount.toString());
-                        if (zeroCount <= 8) { // ป้องกัน 8 รอบ (ประมาณ 3 นาที)
+                        if (zeroCount <= 8) {
                             throw new Error(`ข้อมูลเป็น 0 ผิดปกติ (กันจอกระพริบครั้งที่ ${zeroCount}/8)`);
                         }
                     }
 
-                    // ข้อมูลผ่านเกณฑ์สมบูรณ์ นำไปใช้งานได้
                     lastValidTotal = tempTotal;
                     store.set('pk_last_total', lastValidTotal.toString());
                     zeroCount = 0;
                     store.set('pk_zero_count', '0');
 
-                    // 3. ส่งข้อมูลไปอัปเดตหน้าจอ
                     if (data.rows) processRows(data.rows);
                     else renderSummary(data);
 
@@ -459,7 +449,6 @@
             startCountdown();
         }
 
-        // ================= เรนเดอร์จาก JSON ที่สรุปมาแล้ว =================
         function renderSummary(s) {
             updateOverallStats(s.total, s.packed);
             updateGauges(s.platforms);
@@ -540,6 +529,13 @@
             }
         }
 
+        // ฟังก์ชันช่วยจัดการทศนิยม
+        function formatPercent(packed, total) {
+            if (total === 0) return '0%';
+            let pct = (packed / total) * 100;
+            return (pct === 100 || pct === 0) ? pct.toFixed(0) + '%' : pct.toFixed(2) + '%';
+        }
+
         function updateOverallStats(total, packed) {
             total = total || 0; packed = packed || 0;
             document.getElementById('totalOrders').innerText = total.toLocaleString();
@@ -547,10 +543,9 @@
             let remaining = total - packed;
             document.getElementById('totalRemaining').innerText = remaining.toLocaleString();
             
-            let percentNum = total > 0 ? (packed / total) * 100 : 0;
-            let percentStr = (percentNum === 100 || percentNum === 0) ? percentNum.toFixed(0) : percentNum.toFixed(2);
-            document.getElementById('progressPercentText').innerText = percentStr + '%';
-            document.getElementById('progressBar').style.width = percentNum + '%';
+            let percentText = formatPercent(packed, total);
+            document.getElementById('progressPercentText').innerText = percentText;
+            document.getElementById('progressBar').style.width = (total > 0 ? (packed/total)*100 : 0) + '%';
         }
 
         function updateGauges(plat) {
@@ -559,10 +554,10 @@
             const updateG = (idBase, chartInst, dataObj) => {
                 dataObj = dataObj || blank;
                 let t = dataObj.p + dataObj.r;
-                let pctNum = t > 0 ? (dataObj.p / t) * 100 : 0;
-                let pctStr = (pctNum === 100 || pctNum === 0) ? pctNum.toFixed(0) : pctNum.toFixed(2);
                 
-                document.getElementById(`txt${idBase}Pct`).innerText = pctStr + '%';
+                let pctText = formatPercent(dataObj.p, t);
+                
+                document.getElementById(`txt${idBase}Pct`).innerText = pctText;
                 document.getElementById(`txt${idBase}Val`).innerText = `${dataObj.p.toLocaleString()} / ${t.toLocaleString()}`;
                 
                 chartInst.data.datasets[0].data = [dataObj.p, dataObj.r];
@@ -589,11 +584,11 @@
             sortedCouriers.forEach(c => {
                 let d = couriers[c];
                 let total = d.packed + d.remaining;
-                let percentNum = total > 0 ? (d.packed / total) * 100 : 0;
-                let percentStr = (percentNum === 100 || percentNum === 0) ? percentNum.toFixed(0) : percentNum.toFixed(2);
+                let pctRaw = total > 0 ? (d.packed / total) * 100 : 0;
+                let percentText = formatPercent(d.packed, total);
                 
-                const textColor = percentNum >= 100 ? 'text-emerald-600' : 'text-orange-600';
-                const barColor = percentNum >= 100 ? 'bg-emerald-500' : 'bg-orange-500';
+                const textColor = pctRaw === 100 ? 'text-emerald-600' : 'text-orange-600';
+                const barColor = pctRaw === 100 ? 'bg-emerald-500' : 'bg-orange-500';
 
                 const item = document.createElement('div');
                 item.className = 'flex flex-col bg-slate-50 p-2 2xl:p-3 rounded-xl border border-slate-100';
@@ -603,11 +598,11 @@
                         <div class="text-right leading-none">
                             <span class="font-bold ${textColor} text-xl 2xl:text-2xl">${d.packed.toLocaleString()}</span>
                             <span class="text-sm 2xl:text-base text-slate-400 font-medium ml-1">/ ${total.toLocaleString()}</span>
-                            <span class="ml-2 font-bold bg-white px-1.5 py-0.5 rounded text-slate-600 text-xs border shadow-sm">${percentStr}%</span>
+                            <span class="ml-2 font-bold bg-white px-1.5 py-0.5 rounded text-slate-600 text-xs border shadow-sm">${percentText}</span>
                         </div>
                     </div>
                     <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                        <div class="${barColor} h-full transition-all duration-1000 ${percentNum > 0 && percentNum < 100 ? 'progress-bar-animated' : ''}" style="width: ${percentNum}%"></div>
+                        <div class="${barColor} h-full transition-all duration-1000 ${pctRaw > 0 && pctRaw < 100 ? 'progress-bar-animated' : ''}" style="width: ${pctRaw}%"></div>
                     </div>
                 `;
                 container.appendChild(item);
