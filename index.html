@@ -16,13 +16,13 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         /* สไตล์สำหรับ Gauge Chart */
-        .gauge-container { position: relative; width: 100%; aspect-ratio: 1.8/1; display: flex; justify-content: center; align-items: flex-end; }
-        /* ขยับลงมาด้านล่างนิดนึง (-5%) เพื่อให้อยู่ตรงส่วนที่กว้างที่สุดของครึ่งวงกลม */
-        .gauge-overlay { position: absolute; bottom: -5%; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; justify-content: flex-end; }
+        /* ปรับสัดส่วนเป็น 2/1 ให้เป็นครึ่งวงกลมพอดี จะได้พื้นที่กว้างสุด */
+        .gauge-container { position: relative; width: 100%; aspect-ratio: 2/1; display: flex; justify-content: center; align-items: flex-end; }
+        .gauge-overlay { position: absolute; bottom: -2%; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; justify-content: flex-end; }
         
-        /* ปรับขนาดให้พอดีไม่ล้น (จาก 3.2 เหลือ 2.4) และบีบตัวเลขให้ชิดกันนิดนึง */
-        .gauge-percent { font-size: 2.4rem; font-weight: 400; line-height: 1; letter-spacing: -0.05em; }
-        @media (min-width: 1536px) { .gauge-percent { font-size: 3.5rem; font-weight: 300; } }
+        /* ใช้ clamp ปรับขนาดตามหน้าจอ (vw) รับรองไม่ล้นขอบ 100% แน่นอน */
+        .gauge-percent { font-size: clamp(1.2rem, 1.5vw, 2.2rem); font-weight: 400; line-height: 1; letter-spacing: -0.05em; white-space: nowrap; }
+        @media (min-width: 1536px) { .gauge-percent { font-size: clamp(1.8rem, 1.8vw, 2.6rem); font-weight: 300; } }
         
         /* อนิเมชั่นแถบความคืบหน้า */
         .progress-bar-animated { background-size: 1rem 1rem; background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); animation: progress-stripes 1s linear infinite; }
@@ -60,7 +60,6 @@
             <div class="flex-1 bg-white rounded-2xl shadow-md border-l-8 border-blue-500 p-4 2xl:p-6 flex flex-col justify-center relative overflow-hidden group">
                 <i class="fas fa-box-open absolute -right-4 -bottom-4 text-7xl text-blue-50 opacity-50 transform group-hover:scale-110 transition-transform"></i>
                 <p class="text-slate-500 text-lg 2xl:text-xl font-bold mb-1 z-10">ออเดอร์ทั้งหมด</p>
-                <!-- ปรับ Font ให้บางลงและใหญ่ขึ้น -->
                 <h3 class="text-7xl 2xl:text-8xl font-medium text-slate-800 z-10" id="totalOrders">0</h3>
             </div>
             
@@ -93,54 +92,53 @@
         <!-- ================= กลาง: Platform & Peak Time (50%) ================= -->
         <div class="w-1/2 flex flex-col gap-3 2xl:gap-5 h-full shrink-0">
             <!-- Platform Gauges -->
-            <div class="bg-white rounded-2xl p-4 2xl:p-5 shadow-md flex flex-col shrink-0 h-[40%] border border-slate-200/60">
-                <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 text-xl">
+            <div class="bg-white rounded-2xl p-3 2xl:p-5 shadow-md flex flex-col shrink-0 h-[40%] border border-slate-200/60">
+                <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 text-xl px-1">
                     <i class="fas fa-layer-group text-indigo-500"></i> สัดส่วนออเดอร์แยกตาม Platform
                 </h3>
-                <div class="grid grid-cols-4 gap-2 2xl:gap-4 flex-1 items-center">
+                <div class="grid grid-cols-4 gap-1.5 2xl:gap-3 flex-1 items-center">
                     <!-- Shopee -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
-                        <div class="gauge-container mb-2 w-full max-w-[240px] 2xl:max-w-[340px]">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-1 2xl:p-2 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
+                        <div class="gauge-container mb-1 2xl:mb-2 w-full px-2">
                             <canvas id="gaugeShopee"></canvas>
                             <div class="gauge-overlay text-orange-500"><span id="txtShopeePct" class="gauge-percent">0.00%</span></div>
                         </div>
-                        <div class="text-center w-full mt-2">
-                            <!-- ลดขนาดตัวหนังสือด้านล่างให้สมดุลกับกราฟ -->
-                            <p class="font-normal text-slate-800 text-2xl 2xl:text-4xl tracking-wide mb-1.5">SHOPEE</p>
-                            <div class="bg-orange-100 text-orange-800 font-normal text-xl 2xl:text-3xl px-3 py-1.5 rounded-xl border border-orange-200/50 shadow-inner truncate w-full" id="txtShopeeVal">0 / 0</div>
+                        <div class="text-center w-full mt-1">
+                            <p class="font-normal text-slate-800 text-lg 2xl:text-2xl tracking-wide mb-1">SHOPEE</p>
+                            <div class="bg-orange-100 text-orange-800 font-normal text-base 2xl:text-xl px-1 py-1 rounded-lg border border-orange-200/50 shadow-inner truncate w-full" id="txtShopeeVal">0 / 0</div>
                         </div>
                     </div>
                     <!-- TikTok -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
-                        <div class="gauge-container mb-2 w-full max-w-[240px] 2xl:max-w-[340px]">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-1 2xl:p-2 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
+                        <div class="gauge-container mb-1 2xl:mb-2 w-full px-2">
                             <canvas id="gaugeTiktok"></canvas>
                             <div class="gauge-overlay text-slate-800"><span id="txtTiktokPct" class="gauge-percent">0.00%</span></div>
                         </div>
-                        <div class="text-center w-full mt-2">
-                            <p class="font-normal text-slate-800 text-2xl 2xl:text-4xl tracking-wide mb-1.5">TIKTOK</p>
-                            <div class="bg-slate-200 text-slate-800 font-normal text-xl 2xl:text-3xl px-3 py-1.5 rounded-xl border border-slate-300/50 shadow-inner truncate w-full" id="txtTiktokVal">0 / 0</div>
+                        <div class="text-center w-full mt-1">
+                            <p class="font-normal text-slate-800 text-lg 2xl:text-2xl tracking-wide mb-1">TIKTOK</p>
+                            <div class="bg-slate-200 text-slate-800 font-normal text-base 2xl:text-xl px-1 py-1 rounded-lg border border-slate-300/50 shadow-inner truncate w-full" id="txtTiktokVal">0 / 0</div>
                         </div>
                     </div>
                     <!-- Lazada -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
-                        <div class="gauge-container mb-2 w-full max-w-[240px] 2xl:max-w-[340px]">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-1 2xl:p-2 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
+                        <div class="gauge-container mb-1 2xl:mb-2 w-full px-2">
                             <canvas id="gaugeLazada"></canvas>
                             <div class="gauge-overlay text-blue-600"><span id="txtLazadaPct" class="gauge-percent">0.00%</span></div>
                         </div>
-                        <div class="text-center w-full mt-2">
-                            <p class="font-normal text-slate-800 text-2xl 2xl:text-4xl tracking-wide mb-1.5">LAZADA</p>
-                            <div class="bg-blue-100 text-blue-800 font-normal text-xl 2xl:text-3xl px-3 py-1.5 rounded-xl border border-blue-200/50 shadow-inner truncate w-full" id="txtLazadaVal">0 / 0</div>
+                        <div class="text-center w-full mt-1">
+                            <p class="font-normal text-slate-800 text-lg 2xl:text-2xl tracking-wide mb-1">LAZADA</p>
+                            <div class="bg-blue-100 text-blue-800 font-normal text-base 2xl:text-xl px-1 py-1 rounded-lg border border-blue-200/50 shadow-inner truncate w-full" id="txtLazadaVal">0 / 0</div>
                         </div>
                     </div>
                     <!-- WalkIN -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
-                        <div class="gauge-container mb-2 w-full max-w-[240px] 2xl:max-w-[340px]">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-1 2xl:p-2 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow">
+                        <div class="gauge-container mb-1 2xl:mb-2 w-full px-2">
                             <canvas id="gaugeWalkin"></canvas>
                             <div class="gauge-overlay text-emerald-500"><span id="txtWalkinPct" class="gauge-percent">0.00%</span></div>
                         </div>
-                        <div class="text-center w-full mt-2">
-                            <p class="font-normal text-slate-800 text-2xl 2xl:text-4xl tracking-wide mb-1.5">LINE/OTHER</p>
-                            <div class="bg-emerald-100 text-emerald-800 font-normal text-xl 2xl:text-3xl px-3 py-1.5 rounded-xl border border-emerald-200/50 shadow-inner truncate w-full" id="txtWalkinVal">0 / 0</div>
+                        <div class="text-center w-full mt-1">
+                            <p class="font-normal text-slate-800 text-lg 2xl:text-2xl tracking-wide mb-1 flex-nowrap truncate overflow-hidden">LINE/OTHER</p>
+                            <div class="bg-emerald-100 text-emerald-800 font-normal text-base 2xl:text-xl px-1 py-1 rounded-lg border border-emerald-200/50 shadow-inner truncate w-full" id="txtWalkinVal">0 / 0</div>
                         </div>
                     </div>
                 </div>
@@ -290,7 +288,7 @@
                 maintainAspectRatio: false,
                 circumference: 180,
                 rotation: -90,
-                cutout: '90%', /* วงแหวนบางลงอีก เพื่อให้พื้นที่ตรงกลางกว้างสุดๆ ป้องกันเลขทะลุ */
+                cutout: '88%', /* ปรับเส้นให้บางลงเพื่อเพิ่มพื้นที่วงในให้ 100.00% */
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: false },
@@ -312,7 +310,7 @@
                 });
             };
             gauges.shopee = createGauge('gaugeShopee', '#f97316');
-            gauges.tiktok = createGauge('gaugeTiktok', '#1e293b'); // สีกรมท่าเข้มขึ้นสำหรับ Tiktok
+            gauges.tiktok = createGauge('gaugeTiktok', '#1e293b'); // สีกรมท่าเข้ม
             gauges.lazada = createGauge('gaugeLazada', '#2563eb');
             gauges.walkin = createGauge('gaugeWalkin', '#10b981');
         }
