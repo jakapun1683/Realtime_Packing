@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <!-- Main Content Grid -->
+    <!-- Main Content Grid (3 Columns optimized for 16:9 TV) -->
     <div class="flex-1 flex gap-3 2xl:gap-5 min-h-0">
         
         <!-- ================= ซ้าย: ตัวเลขสรุปผล (20%) ================= -->
@@ -83,57 +83,58 @@
         <!-- ================= กลาง: Platform & Peak Time (50%) ================= -->
         <div class="w-1/2 flex flex-col gap-3 2xl:gap-5 h-full shrink-0">
             <!-- Platform Gauges -->
-            <div class="bg-white rounded-2xl p-3 2xl:p-4 shadow-md flex flex-col flex-[0.75] 2xl:flex-[0.8] border border-slate-200/60 min-h-0">
+            <!-- ขยาย flex-[1.8] เพื่อดันกราฟล่างให้เตี้ยลง และมีที่โชว์เลข -->
+            <div class="bg-white rounded-2xl p-3 2xl:p-4 shadow-md flex flex-col flex-[1.8] 2xl:flex-[1.9] border border-slate-200/60 min-h-0">
                 <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 text-xl shrink-0">
                     <i class="fas fa-layer-group text-indigo-500"></i> สัดส่วนออเดอร์แยกตาม Platform
                 </h3>
                 <div class="grid grid-cols-4 gap-2 2xl:gap-4 flex-1 items-center min-h-0">
                     
                     <!-- Shopee -->
-                    <div class="flex flex-col items-center justify-center bg-slate-50 rounded-xl p-3 border border-slate-100 h-full hover:shadow-md transition-shadow gap-1 2xl:gap-2">
-                        <div class="w-full px-2 2xl:px-4">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
+                        <div class="relative w-full flex justify-center pb-1 flex-1 min-h-0 items-end">
                             <canvas id="gaugeShopee"></canvas>
                         </div>
-                        <span id="txtShopeePct" class="text-orange-500 font-medium tracking-tighter leading-none" style="font-size: clamp(2.5rem, 4vw, 4.5rem);">0%</span>
-                        <div class="text-center w-full mt-1 2xl:mt-2">
-                            <p class="font-bold text-slate-800 tracking-tighter mb-1.5 leading-none" style="font-size: clamp(1.6rem, 2.5vw, 2.5rem);">SHOPEE</p>
-                            <div class="bg-orange-100 text-orange-800 font-bold px-1 py-1.5 2xl:py-2 rounded-lg w-full tracking-tighter leading-none" style="font-size: clamp(1.4rem, 2.2vw, 2.2rem);" id="txtShopeeVal">0 / 0</div>
+                        <div class="text-center w-full shrink-0 mt-1">
+                            <span id="txtShopeePct" class="text-orange-500 font-medium tracking-tight leading-none block mb-1" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
+                            <p class="font-medium text-slate-800 text-3xl 2xl:text-4xl tracking-wide mb-1 2xl:mb-2 leading-none truncate">SHOPEE</p>
+                            <div class="bg-orange-100 text-orange-800 font-medium text-2xl 2xl:text-3xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtShopeeVal">0 / 0</div>
                         </div>
                     </div>
 
                     <!-- TikTok -->
-                    <div class="flex flex-col items-center justify-center bg-slate-50 rounded-xl p-3 border border-slate-100 h-full hover:shadow-md transition-shadow gap-1 2xl:gap-2">
-                        <div class="w-full px-2 2xl:px-4">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
+                        <div class="relative w-full flex justify-center pb-1 flex-1 min-h-0 items-end">
                             <canvas id="gaugeTiktok"></canvas>
                         </div>
-                        <span id="txtTiktokPct" class="text-slate-800 font-medium tracking-tighter leading-none" style="font-size: clamp(2.5rem, 4vw, 4.5rem);">0%</span>
-                        <div class="text-center w-full mt-1 2xl:mt-2">
-                            <p class="font-bold text-slate-800 tracking-tighter mb-1.5 leading-none" style="font-size: clamp(1.6rem, 2.5vw, 2.5rem);">TIKTOK</p>
-                            <div class="bg-slate-200 text-slate-800 font-bold px-1 py-1.5 2xl:py-2 rounded-lg w-full tracking-tighter leading-none" style="font-size: clamp(1.4rem, 2.2vw, 2.2rem);" id="txtTiktokVal">0 / 0</div>
+                        <div class="text-center w-full shrink-0 mt-1">
+                            <span id="txtTiktokPct" class="text-slate-800 font-medium tracking-tight leading-none block mb-1" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
+                            <p class="font-medium text-slate-800 text-3xl 2xl:text-4xl tracking-wide mb-1 2xl:mb-2 leading-none truncate">TIKTOK</p>
+                            <div class="bg-slate-200 text-slate-800 font-medium text-2xl 2xl:text-3xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtTiktokVal">0 / 0</div>
                         </div>
                     </div>
 
                     <!-- Lazada -->
-                    <div class="flex flex-col items-center justify-center bg-slate-50 rounded-xl p-3 border border-slate-100 h-full hover:shadow-md transition-shadow gap-1 2xl:gap-2">
-                        <div class="w-full px-2 2xl:px-4">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
+                        <div class="relative w-full flex justify-center pb-1 flex-1 min-h-0 items-end">
                             <canvas id="gaugeLazada"></canvas>
                         </div>
-                        <span id="txtLazadaPct" class="text-blue-600 font-medium tracking-tighter leading-none" style="font-size: clamp(2.5rem, 4vw, 4.5rem);">0%</span>
-                        <div class="text-center w-full mt-1 2xl:mt-2">
-                            <p class="font-bold text-slate-800 tracking-tighter mb-1.5 leading-none" style="font-size: clamp(1.6rem, 2.5vw, 2.5rem);">LAZADA</p>
-                            <div class="bg-blue-100 text-blue-800 font-bold px-1 py-1.5 2xl:py-2 rounded-lg w-full tracking-tighter leading-none" style="font-size: clamp(1.4rem, 2.2vw, 2.2rem);" id="txtLazadaVal">0 / 0</div>
+                        <div class="text-center w-full shrink-0 mt-1">
+                            <span id="txtLazadaPct" class="text-blue-600 font-medium tracking-tight leading-none block mb-1" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
+                            <p class="font-medium text-slate-800 text-3xl 2xl:text-4xl tracking-wide mb-1 2xl:mb-2 leading-none truncate">LAZADA</p>
+                            <div class="bg-blue-100 text-blue-800 font-medium text-2xl 2xl:text-3xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtLazadaVal">0 / 0</div>
                         </div>
                     </div>
 
                     <!-- WalkIN -->
-                    <div class="flex flex-col items-center justify-center bg-slate-50 rounded-xl p-3 border border-slate-100 h-full hover:shadow-md transition-shadow gap-1 2xl:gap-2">
-                        <div class="w-full px-2 2xl:px-4">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 h-full justify-center hover:shadow-md transition-shadow min-h-0">
+                        <div class="relative w-full flex justify-center pb-1 flex-1 min-h-0 items-end">
                             <canvas id="gaugeWalkin"></canvas>
                         </div>
-                        <span id="txtWalkinPct" class="text-emerald-500 font-medium tracking-tighter leading-none" style="font-size: clamp(2.5rem, 4vw, 4.5rem);">0%</span>
-                        <div class="text-center w-full mt-1 2xl:mt-2">
-                            <p class="font-bold text-slate-800 tracking-tighter mb-1.5 leading-none" style="font-size: clamp(1.6rem, 2.5vw, 2.5rem);">WALK IN</p>
-                            <div class="bg-emerald-100 text-emerald-800 font-bold px-1 py-1.5 2xl:py-2 rounded-lg w-full tracking-tighter leading-none" style="font-size: clamp(1.4rem, 2.2vw, 2.2rem);" id="txtWalkinVal">0 / 0</div>
+                        <div class="text-center w-full shrink-0 mt-1">
+                            <span id="txtWalkinPct" class="text-emerald-500 font-medium tracking-tight leading-none block mb-1" style="font-size: clamp(2rem, 3.5vw, 4.5rem);">0%</span>
+                            <p class="font-medium text-slate-800 text-3xl 2xl:text-4xl tracking-wide mb-1 2xl:mb-2 leading-none truncate">WALK IN</p>
+                            <div class="bg-emerald-100 text-emerald-800 font-medium text-2xl 2xl:text-3xl px-2 py-1.5 2xl:py-2 rounded truncate w-full" id="txtWalkinVal">0 / 0</div>
                         </div>
                     </div>
 
@@ -141,7 +142,7 @@
             </div>
 
             <!-- Peak Time Chart -->
-            <div class="bg-white rounded-2xl p-4 2xl:p-6 shadow-md border border-slate-200/60 flex-[1.25] 2xl:flex-[1.2] flex flex-col min-h-0 relative">
+            <div class="bg-white rounded-2xl p-4 2xl:p-5 shadow-md border border-slate-200/60 flex-1 flex flex-col min-h-0 relative">
                 <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 text-xl shrink-0">
                     <i class="fas fa-chart-area text-indigo-500"></i> แนวโน้มการแพ็คออเดอร์ (Peak Time)
                 </h3>
@@ -196,7 +197,7 @@
                     <label class="block text-base font-bold text-slate-700 mb-1">ลิงก์ข้อมูล (ไม่ต้องกรอกก็ได้)</label>
                     <input type="text" id="csvURL" class="w-full bg-slate-50 border border-slate-300 text-slate-800 text-base rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block p-3" placeholder="เว้นว่าง = ไล่หาช่องทางที่ใช้ได้อัตโนมัติ">
                     <p class="text-sm text-slate-500 mt-2 font-medium leading-relaxed">
-                        <i class="fas fa-wand-magic-sparkles text-indigo-500"></i> ปกติเว้นว่างไว้ ระบบจะไล่ลองหาช่องทางที่เร็วที่สุดอัตโนมัติ<br>
+                        <i class="fas fa-wand-magic-sparkles text-indigo-500"></i> ปกติเว้นว่างไว้ ระบบจะไล่ลองหาช่องทางอัตโนมัติ<br>
                     </p>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
@@ -218,10 +219,10 @@
     </div>
 
     <!-- Error Alert -->
-    <div id="errorAlert" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-rose-600 text-white p-4 px-6 rounded-full shadow-2xl hidden z-50 animate-bounce flex items-center gap-3">
+    <div id="errorAlert" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-rose-600 text-white p-4 px-6 rounded-full shadow-2xl hidden z-50 flex items-center gap-3">
         <i class="fas fa-exclamation-triangle text-2xl text-yellow-300"></i>
         <div>
-            <h3 class="font-bold text-lg leading-tight">เกิดข้อผิดพลาดในการดึงข้อมูล</h3>
+            <h3 class="font-bold text-lg leading-tight">พบปัญหาการดึงข้อมูล</h3>
             <p id="errorMsg" class="text-sm font-medium opacity-90"></p>
         </div>
         <button onclick="document.getElementById('errorAlert').classList.add('hidden')" class="ml-4 text-white hover:text-rose-200"><i class="fas fa-times text-xl"></i></button>
@@ -268,23 +269,20 @@
         let peakChartInst = null;
         let scrollIntervals = {};
 
-        // ระบบกันหน้าจอกระพริบเป็น 0
+        // Zero Protection Logic
         let lastValidTotal = parseInt(store.get('pk_last_total')) || 0;
         let zeroCount = parseInt(store.get('pk_zero_count')) || 0;
 
-        // การตั้งค่าวงแหวน
         const gaugeOptions = {
             type: 'doughnut',
             options: {
                 responsive: true,
-                maintainAspectRatio: true, 
-                aspectRatio: 2,
+                maintainAspectRatio: true,
+                aspectRatio: 2.2, // ปรับให้เส้นโค้งแบนลงอีกนิด เพื่อคืนพื้นที่ให้ตัวหนังสือ
                 circumference: 180,
                 rotation: -90,
-                cutout: '88%',
-                layout: {
-                    padding: { bottom: 0, left: 5, right: 5, top: 10 }
-                },
+                cutout: '86%',
+                layout: { padding: { bottom: 0, top: 10 } },
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: false },
@@ -301,12 +299,12 @@
                     ...gaugeOptions,
                     data: {
                         labels: ['Packed', 'Remaining'],
-                        datasets: [{ data: [0, 100], backgroundColor: [color, '#e2e8f0'], borderWidth: 0, borderRadius: [10, 0] }]
+                        datasets: [{ data: [0, 100], backgroundColor: [color, '#e2e8f0'], borderWidth: 0, borderRadius: [20, 0] }]
                     }
                 });
             };
             gauges.shopee = createGauge('gaugeShopee', '#f97316');
-            gauges.tiktok = createGauge('gaugeTiktok', '#1e293b'); 
+            gauges.tiktok = createGauge('gaugeTiktok', '#1e293b');
             gauges.lazada = createGauge('gaugeLazada', '#2563eb');
             gauges.walkin = createGauge('gaugeWalkin', '#10b981');
         }
@@ -332,8 +330,7 @@
                 };
                 const timer = setTimeout(() => {
                     if (settled) return;
-                    settled = true; cleanup();
-                    reject(new Error('หมดเวลารอ (อาจถูกเด้งไปหน้า login)'));
+                    settled = true; cleanup(); reject(new Error('Timeout'));
                 }, timeoutMs || 9000);
 
                 window[cbName] = (data) => {
@@ -342,8 +339,7 @@
                 };
                 tag.onerror = () => {
                     if (settled) return;
-                    settled = true; clearTimeout(timer); cleanup();
-                    reject(new Error('โหลดสคริปต์ไม่สำเร็จ'));
+                    settled = true; clearTimeout(timer); cleanup(); reject(new Error('Script Error'));
                 };
 
                 tag.src = bust(url, 'callback=' + cbName + '&');
@@ -352,8 +348,7 @@
         }
 
         function loadJson(url) {
-            return fetch(bust(url), { cache: 'no-store', redirect: 'follow' })
-                .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); });
+            return fetch(bust(url), { cache: 'no-store' }).then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); });
         }
 
         function loadCsv(url) {
@@ -361,7 +356,7 @@
                 Papa.parse(bust(url), {
                     download: true, header: true, skipEmptyLines: true,
                     complete: r => resolve({ rows: r.data }),
-                    error: e => reject(new Error((e && e.message) || 'ดาวน์โหลด CSV ไม่สำเร็จ'))
+                    error: e => reject(new Error((e && e.message) || 'CSV Error'))
                 });
             });
         }
@@ -380,7 +375,6 @@
         async function fetchData() {
             showLoading(true);
             const sources = getSources();
-            
             const order = manualUrl ? sources.slice(activeIdx).concat(sources.slice(0, activeIdx)) : sources;
             const problems = [];
 
@@ -410,16 +404,23 @@
                         tempTotal = data.total;
                     }
 
-                    if (!isStructValid) throw new Error('โครงสร้างชีตผิด');
+                    if (!isStructValid) throw new Error('Invalid Structure');
 
+                    // Zero Protection Mechanism
                     if (tempTotal === 0 && lastValidTotal > 0) {
                         zeroCount++;
                         store.set('pk_zero_count', zeroCount.toString());
-                        if (zeroCount <= 8) {
-                            throw new Error(`ข้อมูลเป็น 0 ผิดปกติ (กันจอกระพริบครั้งที่ ${zeroCount}/8)`);
+                        if (zeroCount <= 5) {
+                            console.warn(`[Zero Protection] ข้ามข้อมูล 0 ชั่วคราว (ครั้งที่ ${zeroCount}/5)`);
+                            activeIdx = sources.indexOf(src);
+                            document.getElementById('errorAlert').classList.add('hidden');
+                            showLoading(false, "กำลังเชื่อมต่อ (ป้องกันข้อมูล 0)");
+                            startCountdown();
+                            return;
                         }
                     }
 
+                    // อัปเดตข้อมูลจริง
                     lastValidTotal = tempTotal;
                     store.set('pk_last_total', lastValidTotal.toString());
                     zeroCount = 0;
@@ -430,18 +431,17 @@
 
                     activeIdx = manualUrl ? sources.indexOf(src) : 0;
                     document.getElementById('errorAlert').classList.add('hidden');
-                    document.getElementById('sourceModeText').innerText =
-                        (src.live ? 'เรียลไทม์ · ' : 'สำรอง · ') + src.name;
+                    document.getElementById('sourceModeText').innerText = (src.live ? 'เรียลไทม์ · ' : 'สำรอง · ') + src.name;
                     showLoading(false, data.updatedAt);
                     startCountdown();
                     return;
                 } catch (err) {
-                    console.warn('[source ล้มเหลว]', src.name, err.message);
+                    console.warn('[source fail]', src.name, err.message);
                     problems.push(src.name);
                 }
             }
 
-            showError('ดึงข้อมูลไม่สำเร็จ (' + problems.join(', ') + ')');
+            showError('ดึงข้อมูลไม่สำเร็จ — เช็คอินเทอร์เน็ตของทีวี หรือแอปสคริปต์อาจจะพัง');
             showLoading(false);
             startCountdown();
         }
@@ -528,8 +528,8 @@
 
         function formatPercent(packed, total) {
             if (total === 0) return '0%';
-            let pctNum = (packed / total) * 100;
-            return (pctNum === 100 || pctNum === 0) ? pctNum.toFixed(0) + '%' : pctNum.toFixed(2) + '%';
+            let pct = (packed / total) * 100;
+            return (pct === 100 || pct === 0) ? pct.toFixed(0) + '%' : pct.toFixed(2) + '%';
         }
 
         function updateOverallStats(total, packed) {
@@ -581,14 +581,14 @@
                 let pctRaw = total > 0 ? (d.packed / total) * 100 : 0;
                 let percentText = formatPercent(d.packed, total);
                 
-                const textColor = pctRaw >= 100 ? 'text-emerald-600' : 'text-orange-600';
-                const barColor = pctRaw >= 100 ? 'bg-emerald-500' : 'bg-orange-500';
+                const textColor = pctRaw === 100 ? 'text-emerald-600' : 'text-orange-600';
+                const barColor = pctRaw === 100 ? 'bg-emerald-500' : 'bg-orange-500';
 
                 const item = document.createElement('div');
                 item.className = 'flex flex-col bg-slate-50 p-2 2xl:p-3 rounded-xl border border-slate-100';
                 item.innerHTML = `
                     <div class="flex justify-between items-end mb-2">
-                        <span class="font-bold text-slate-700 text-base 2xl:text-lg truncate max-w-[65%]" title="${c}">${c}</span>
+                        <span class="font-bold text-slate-700 text-base 2xl:text-lg truncate max-w-[65%]">${c}</span>
                         <div class="text-right leading-none">
                             <span class="font-bold ${textColor} text-xl 2xl:text-2xl">${d.packed.toLocaleString()}</span>
                             <span class="text-sm 2xl:text-base text-slate-400 font-medium ml-1">/ ${total.toLocaleString()}</span>
@@ -645,11 +645,6 @@
         }
 
         function updatePeakTimeChart(peakData) {
-            // บังคับให้มีเวลา 12:00 ในแกน X เสมอ แม้ช่วงนั้นจะไม่มีออเดอร์
-            if (peakData['12:00'] === undefined) {
-                peakData['12:00'] = 0;
-            }
-
             const sortedHours = Object.keys(peakData).sort();
             const dataValues = sortedHours.map(h => peakData[h]);
 
@@ -720,22 +715,18 @@
                 let scrollPos = 0;
                 let direction = 1;
                 let isPaused = false;
-                const scrollStep = 1;
                 
                 scrollIntervals[containerId] = setInterval(() => {
                     if(isPaused) return;
-                    
-                    scrollPos += direction * scrollStep;
+                    scrollPos += direction * 1;
                     el.scrollTop = scrollPos;
                     
                     if (scrollPos >= (el.scrollHeight - el.clientHeight)) {
-                        isPaused = true;
-                        direction = -1;
+                        isPaused = true; direction = -1;
                         setTimeout(() => { isPaused = false; }, 3000);
                     } 
                     else if (scrollPos <= 0) {
-                        isPaused = true;
-                        direction = 1;
+                        isPaused = true; direction = 1;
                         setTimeout(() => { isPaused = false; }, 3000);
                     }
                 }, 40);
@@ -754,8 +745,10 @@
                 ind.classList.replace('bg-slate-600/50', 'bg-indigo-600/50');
                 ind.classList.replace('border-slate-500/50', 'border-indigo-500/50');
                 ind.querySelector('div').className = 'w-3 h-3 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.8)]';
-                if (serverTime) {
+                if (serverTime && serverTime !== "กำลังเชื่อมต่อ (ป้องกันข้อมูล 0)") {
                     txt.innerText = `อัปเดต: ${serverTime}`;
+                } else if (serverTime) {
+                    txt.innerText = serverTime; // สถานะแจ้งเตือนพิเศษ
                 } else {
                     const d = new Date();
                     txt.innerText = `อัปเดต: ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
@@ -813,6 +806,7 @@
             fetchData();
         }
 
+        // Boot
         window.onload = () => {
             initGauges();
             fetchData();
