@@ -83,61 +83,62 @@
         <!-- ================= กลาง: Platform & Peak Time (50%) ================= -->
         <div class="w-1/2 flex flex-col gap-3 2xl:gap-5 h-full shrink-0">
             <!-- Platform Gauges -->
-            <div class="bg-white rounded-2xl p-3 2xl:p-5 shadow-md flex flex-col shrink-0 border border-slate-200/60" style="flex: 0 0 auto;">
-                <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 text-xl px-1">
+            <div class="bg-white rounded-2xl p-3 2xl:p-4 shadow-md flex flex-col shrink-0 border border-slate-200/60">
+                <h3 class="text-slate-800 font-bold flex items-center gap-2 mb-2 text-xl px-1 shrink-0">
                     <i class="fas fa-layer-group text-indigo-500"></i> สัดส่วนออเดอร์แยกตาม Platform
                 </h3>
-                <div class="grid grid-cols-4 gap-2 2xl:gap-3 items-stretch">
+                <div class="grid grid-cols-4 gap-2 2xl:gap-3 flex-1 items-stretch min-h-0">
                     <!-- Shopee -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow">
-                        <div class="relative w-full">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow justify-between">
+                        <!-- กราฟและเปอร์เซ็นต์ (ซ้อนกันเพื่อประหยัดพื้นที่แนวตั้ง) -->
+                        <div class="relative w-full flex justify-center pb-1">
                             <canvas id="gaugeShopee"></canvas>
-                            <div class="absolute bottom-1 left-0 right-0 flex justify-center items-end">
-                                <span id="txtShopeePct" class="text-orange-500 font-normal tracking-tight leading-none" style="font-size: 1.5rem; font-size: clamp(1.2rem, 1.6vw, 2.2rem);">0.00%</span>
+                            <div class="absolute bottom-0 left-0 right-0 flex justify-center translate-y-1">
+                                <span id="txtShopeePct" class="text-orange-500 font-normal tracking-tight leading-none" style="font-size: clamp(1.8rem, 3vw, 3.5rem);">0%</span>
                             </div>
                         </div>
-                        <div class="text-center w-full mt-2">
-                            <p class="font-normal text-slate-800 text-lg 2xl:text-2xl tracking-wide mb-1">SHOPEE</p>
-                            <div class="bg-orange-100 text-orange-800 font-normal text-sm 2xl:text-xl px-2 py-1 rounded truncate w-full" id="txtShopeeVal">0 / 0</div>
+                        <div class="text-center w-full mt-2 shrink-0">
+                            <p class="font-normal text-slate-800 text-base 2xl:text-xl tracking-wide mb-1 leading-none">SHOPEE</p>
+                            <div class="bg-orange-100 text-orange-800 font-normal text-sm 2xl:text-lg px-2 py-0.5 rounded truncate w-full" id="txtShopeeVal">0 / 0</div>
                         </div>
                     </div>
                     <!-- TikTok -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow">
-                        <div class="relative w-full">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow justify-between">
+                        <div class="relative w-full flex justify-center pb-1">
                             <canvas id="gaugeTiktok"></canvas>
-                            <div class="absolute bottom-1 left-0 right-0 flex justify-center items-end">
-                                <span id="txtTiktokPct" class="text-slate-800 font-normal tracking-tight leading-none" style="font-size: 1.5rem; font-size: clamp(1.2rem, 1.6vw, 2.2rem);">0.00%</span>
+                            <div class="absolute bottom-0 left-0 right-0 flex justify-center translate-y-1">
+                                <span id="txtTiktokPct" class="text-slate-800 font-normal tracking-tight leading-none" style="font-size: clamp(1.8rem, 3vw, 3.5rem);">0%</span>
                             </div>
                         </div>
-                        <div class="text-center w-full mt-2">
-                            <p class="font-normal text-slate-800 text-lg 2xl:text-2xl tracking-wide mb-1">TIKTOK</p>
-                            <div class="bg-slate-200 text-slate-800 font-normal text-sm 2xl:text-xl px-2 py-1 rounded truncate w-full" id="txtTiktokVal">0 / 0</div>
+                        <div class="text-center w-full mt-2 shrink-0">
+                            <p class="font-normal text-slate-800 text-base 2xl:text-xl tracking-wide mb-1 leading-none">TIKTOK</p>
+                            <div class="bg-slate-200 text-slate-800 font-normal text-sm 2xl:text-lg px-2 py-0.5 rounded truncate w-full" id="txtTiktokVal">0 / 0</div>
                         </div>
                     </div>
                     <!-- Lazada -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow">
-                        <div class="relative w-full">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow justify-between">
+                        <div class="relative w-full flex justify-center pb-1">
                             <canvas id="gaugeLazada"></canvas>
-                            <div class="absolute bottom-1 left-0 right-0 flex justify-center items-end">
-                                <span id="txtLazadaPct" class="text-blue-600 font-normal tracking-tight leading-none" style="font-size: 1.5rem; font-size: clamp(1.2rem, 1.6vw, 2.2rem);">0.00%</span>
+                            <div class="absolute bottom-0 left-0 right-0 flex justify-center translate-y-1">
+                                <span id="txtLazadaPct" class="text-blue-600 font-normal tracking-tight leading-none" style="font-size: clamp(1.8rem, 3vw, 3.5rem);">0%</span>
                             </div>
                         </div>
-                        <div class="text-center w-full mt-2">
-                            <p class="font-normal text-slate-800 text-lg 2xl:text-2xl tracking-wide mb-1">LAZADA</p>
-                            <div class="bg-blue-100 text-blue-800 font-normal text-sm 2xl:text-xl px-2 py-1 rounded truncate w-full" id="txtLazadaVal">0 / 0</div>
+                        <div class="text-center w-full mt-2 shrink-0">
+                            <p class="font-normal text-slate-800 text-base 2xl:text-xl tracking-wide mb-1 leading-none">LAZADA</p>
+                            <div class="bg-blue-100 text-blue-800 font-normal text-sm 2xl:text-lg px-2 py-0.5 rounded truncate w-full" id="txtLazadaVal">0 / 0</div>
                         </div>
                     </div>
                     <!-- WalkIN -->
-                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow">
-                        <div class="relative w-full">
+                    <div class="flex flex-col items-center bg-slate-50 rounded-xl p-2 2xl:p-3 border border-slate-100 hover:shadow-md transition-shadow justify-between">
+                        <div class="relative w-full flex justify-center pb-1">
                             <canvas id="gaugeWalkin"></canvas>
-                            <div class="absolute bottom-1 left-0 right-0 flex justify-center items-end">
-                                <span id="txtWalkinPct" class="text-emerald-500 font-normal tracking-tight leading-none" style="font-size: 1.5rem; font-size: clamp(1.2rem, 1.6vw, 2.2rem);">0.00%</span>
+                            <div class="absolute bottom-0 left-0 right-0 flex justify-center translate-y-1">
+                                <span id="txtWalkinPct" class="text-emerald-500 font-normal tracking-tight leading-none" style="font-size: clamp(1.8rem, 3vw, 3.5rem);">0%</span>
                             </div>
                         </div>
-                        <div class="text-center w-full mt-2">
-                            <p class="font-normal text-slate-800 text-lg 2xl:text-2xl tracking-wide mb-1">LINE/OTHER</p>
-                            <div class="bg-emerald-100 text-emerald-800 font-normal text-sm 2xl:text-xl px-2 py-1 rounded truncate w-full" id="txtWalkinVal">0 / 0</div>
+                        <div class="text-center w-full mt-2 shrink-0">
+                            <p class="font-normal text-slate-800 text-base 2xl:text-xl tracking-wide mb-1 leading-none">LINE/OTHER</p>
+                            <div class="bg-emerald-100 text-emerald-800 font-normal text-sm 2xl:text-lg px-2 py-0.5 rounded truncate w-full" id="txtWalkinVal">0 / 0</div>
                         </div>
                     </div>
                 </div>
@@ -276,18 +277,18 @@
         let lastValidTotal = 0;
         let zeroCount = 0;
 
-        /* แก้บั๊กกราฟบนทีวี: บังคับให้กราฟคำนวณสัดส่วนเอง ไม่พึ่งพา CSS ของ Browser เก่า */
+        /* บังคับสัดส่วนกราฟจาก Chart.js ป้องกันบั๊กบนทีวี */
         const gaugeOptions = {
             type: 'doughnut',
             options: {
                 responsive: true,
                 maintainAspectRatio: true, 
-                aspectRatio: 1.65, /* ให้ความสูงแปรผันตามความกว้างเสมอ ป้องกันกราฟหาย */
+                aspectRatio: 1.85, /* สัดส่วนที่ใกล้เคียงครึ่งวงกลม ตัดขอบว่างบนล่างออก */
                 circumference: 180,
                 rotation: -90,
                 cutout: '88%',
                 layout: {
-                    padding: { bottom: 0, left: 10, right: 10, top: 10 }
+                    padding: { bottom: 10, left: 5, right: 5, top: 10 }
                 },
                 plugins: {
                     legend: { display: false },
@@ -534,7 +535,7 @@
             document.getElementById('totalRemaining').innerText = remaining.toLocaleString();
             
             let percentNum = total > 0 ? (packed / total) * 100 : 0;
-            let percentStr = percentNum.toFixed(2);
+            let percentStr = percentNum >= 100 ? '100' : (percentNum === 0 ? '0' : percentNum.toFixed(2));
             document.getElementById('progressPercentText').innerText = percentStr + '%';
             document.getElementById('progressBar').style.width = percentNum + '%';
         }
@@ -546,7 +547,7 @@
                 dataObj = dataObj || blank;
                 let t = dataObj.p + dataObj.r;
                 let pctNum = t > 0 ? (dataObj.p / t) * 100 : 0;
-                let pctStr = pctNum.toFixed(2);
+                let pctStr = pctNum >= 100 ? '100' : (pctNum === 0 ? '0' : pctNum.toFixed(2));
                 
                 document.getElementById(`txt${idBase}Pct`).innerText = pctStr + '%';
                 document.getElementById(`txt${idBase}Val`).innerText = `${dataObj.p.toLocaleString()} / ${t.toLocaleString()}`;
@@ -576,10 +577,10 @@
                 let d = couriers[c];
                 let total = d.packed + d.remaining;
                 let percentNum = total > 0 ? (d.packed / total) * 100 : 0;
-                let percentStr = percentNum.toFixed(2);
+                let percentStr = percentNum >= 100 ? '100' : (percentNum === 0 ? '0' : percentNum.toFixed(2));
                 
-                const textColor = percentNum === 100 ? 'text-emerald-600' : 'text-orange-600';
-                const barColor = percentNum === 100 ? 'bg-emerald-500' : 'bg-orange-500';
+                const textColor = percentNum >= 100 ? 'text-emerald-600' : 'text-orange-600';
+                const barColor = percentNum >= 100 ? 'bg-emerald-500' : 'bg-orange-500';
 
                 const item = document.createElement('div');
                 item.className = 'flex flex-col bg-slate-50 p-2 2xl:p-3 rounded-xl border border-slate-100';
