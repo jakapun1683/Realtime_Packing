@@ -644,7 +644,17 @@
             applyAutoScroll('leaderboardList');
         }
 
+        // ชั่วโมงที่ต้องโชว์บนแกนเสมอ แม้ไม่มีออเดอร์แพ็คในชั่วโมงนั้น (ช่วงพักเที่ยง)
+        const ALWAYS_SHOW_HOURS = ['12:00'];
+
         function updatePeakTimeChart(peakData) {
+            // ถ้ามีข้อมูลอยู่แล้ว ให้เติมชั่วโมงที่ขาดหายเป็น 0 เพื่อไม่ให้แกนเวลากระโดด
+            if (Object.keys(peakData).length > 0) {
+                ALWAYS_SHOW_HOURS.forEach(h => {
+                    if (peakData[h] === undefined) peakData[h] = 0;
+                });
+            }
+
             const sortedHours = Object.keys(peakData).sort();
             const dataValues = sortedHours.map(h => peakData[h]);
 
