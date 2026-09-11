@@ -16,10 +16,10 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         /* สไตล์สำหรับ Gauge Chart */
-        .gauge-container { position: relative; width: 100%; aspect-ratio: 1.8/1; display: flex; justify-content: center; align-items: flex-end; }
+        .gauge-container { position: relative; width: 100%; aspect-ratio: 2/1; display: flex; justify-content: center; align-items: flex-end; }
         .gauge-overlay { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; display: flex; flex-direction: column; justify-content: flex-end; padding-bottom: 2%; }
-        .gauge-percent { font-size: 2.2rem; font-weight: 600; line-height: 1; letter-spacing: -0.02em; }
-        @media (min-width: 1536px) { .gauge-percent { font-size: 3rem; } }
+        .gauge-percent { font-size: 1.35rem; font-weight: 700; line-height: 1; letter-spacing: 0; }
+        @media (min-width: 1536px) { .gauge-percent { font-size: 1.85rem; } }
         
         /* อนิเมชั่นแถบความคืบหน้า */
         .progress-bar-animated { background-size: 1rem 1rem; background-image: linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent); animation: progress-stripes 1s linear infinite; }
@@ -287,7 +287,7 @@
                 maintainAspectRatio: false,
                 circumference: 180,
                 rotation: -90,
-                cutout: '75%',
+                cutout: '82%',
                 plugins: {
                     legend: { display: false },
                     tooltip: { enabled: false },
@@ -547,9 +547,10 @@
             let remaining = total - packed;
             document.getElementById('totalRemaining').innerText = remaining.toLocaleString();
             
-            let percent = total > 0 ? Math.round((packed / total) * 100) : 0;
-            document.getElementById('progressPercentText').innerText = percent + '%';
-            document.getElementById('progressBar').style.width = percent + '%';
+            let percentNum = total > 0 ? (packed / total) * 100 : 0;
+            let percentStr = percentNum.toFixed(2);
+            document.getElementById('progressPercentText').innerText = percentStr + '%';
+            document.getElementById('progressBar').style.width = percentNum + '%';
         }
 
         function updateGauges(plat) {
@@ -558,9 +559,10 @@
             const updateG = (idBase, chartInst, dataObj) => {
                 dataObj = dataObj || blank;
                 let t = dataObj.p + dataObj.r;
-                let pct = t > 0 ? Math.round((dataObj.p / t) * 100) : 0;
+                let pctNum = t > 0 ? (dataObj.p / t) * 100 : 0;
+                let pctStr = pctNum.toFixed(2);
                 
-                document.getElementById(`txt${idBase}Pct`).innerText = pct + '%';
+                document.getElementById(`txt${idBase}Pct`).innerText = pctStr + '%';
                 document.getElementById(`txt${idBase}Val`).innerText = `${dataObj.p.toLocaleString()} / ${t.toLocaleString()}`;
                 
                 chartInst.data.datasets[0].data = [dataObj.p, dataObj.r];
@@ -587,10 +589,11 @@
             sortedCouriers.forEach(c => {
                 let d = couriers[c];
                 let total = d.packed + d.remaining;
-                let percent = total > 0 ? Math.round((d.packed / total) * 100) : 0;
+                let percentNum = total > 0 ? (d.packed / total) * 100 : 0;
+                let percentStr = percentNum.toFixed(2);
                 
-                const textColor = percent === 100 ? 'text-emerald-600' : 'text-orange-600';
-                const barColor = percent === 100 ? 'bg-emerald-500' : 'bg-orange-500';
+                const textColor = percentNum === 100 ? 'text-emerald-600' : 'text-orange-600';
+                const barColor = percentNum === 100 ? 'bg-emerald-500' : 'bg-orange-500';
 
                 const item = document.createElement('div');
                 item.className = 'flex flex-col bg-slate-50 p-2 2xl:p-3 rounded-xl border border-slate-100';
@@ -600,11 +603,11 @@
                         <div class="text-right leading-none">
                             <span class="font-bold ${textColor} text-xl 2xl:text-2xl">${d.packed.toLocaleString()}</span>
                             <span class="text-sm 2xl:text-base text-slate-400 font-medium ml-1">/ ${total.toLocaleString()}</span>
-                            <span class="ml-2 font-bold bg-white px-1.5 py-0.5 rounded text-slate-600 text-xs border shadow-sm">${percent}%</span>
+                            <span class="ml-2 font-bold bg-white px-1.5 py-0.5 rounded text-slate-600 text-xs border shadow-sm">${percentStr}%</span>
                         </div>
                     </div>
                     <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                        <div class="${barColor} h-full transition-all duration-1000 ${percent > 0 && percent < 100 ? 'progress-bar-animated' : ''}" style="width: ${percent}%"></div>
+                        <div class="${barColor} h-full transition-all duration-1000 ${percentNum > 0 && percentNum < 100 ? 'progress-bar-animated' : ''}" style="width: ${percentNum}%"></div>
                     </div>
                 `;
                 container.appendChild(item);
